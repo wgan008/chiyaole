@@ -154,7 +154,8 @@ def resolve_drug(raw: str) -> str | None:
     Behaviour, in order:
       1. Exact match against a known alias → return its code.
       2. Match against a known *combination* product → return None (different entity).
-      3. Strip salt prefixes (苯磺酸/马来酸/…) and dosage-form suffixes (片/胶囊/缓释片/…), retry 1–2.
+      3. Strip salt prefixes (苯磺酸/马来酸/…) and dosage-form suffixes (片/胶囊/缓释片/…),
+         retry 1–2.
       4. Two different generic stems present in one string → an unlisted combination → None.
       5. Pinyin edit distance ≤ 2, and only if exactly one candidate is in range.
       6. Otherwise None.

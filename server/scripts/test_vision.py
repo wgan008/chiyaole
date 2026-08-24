@@ -4,7 +4,8 @@ Not part of the app or CI — a standalone way to sanity-check OCR quality again
 data/test_photos before the full server (assets upload, /api/parse/medbox route) exists.
 
 Usage:
-    DASHSCOPE_API_KEY=... .venv/bin/python scripts/test_vision.py ../data/test_photos/5982.JPG [more.jpg ...]
+    DASHSCOPE_API_KEY=... .venv/bin/python scripts/test_vision.py \
+        ../data/test_photos/5982.JPG [more.jpg ...]
 
 Multiple paths are treated as multiple angles of the SAME pill box (spec: "usually 2
 photos: front and the dosage side") and passed to one parse_medbox() call together. To

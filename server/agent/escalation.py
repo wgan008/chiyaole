@@ -22,7 +22,7 @@ and there is no code path that can produce the past tense before delivery is con
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from . import loader
 from .types import Escalation, EscalationKind, EscalationState, Refuse
@@ -119,7 +119,7 @@ def next_retry_at(attempts: int, *, now: datetime | None = None) -> datetime | N
     """Exponential backoff from remote_config. None once the 7-day budget is spent."""
     cfg = loader.remote_config()["escalation"]
     backoff: list[int] = cfg["retry_backoff_seconds"]
-    now = now or datetime.now(timezone.utc)
+    now = now or datetime.now(UTC)
     if attempts >= len(backoff):
         elapsed = timedelta(seconds=sum(backoff))
         if elapsed >= timedelta(days=cfg["max_retry_days"]):
@@ -139,7 +139,7 @@ def transition(
     Returns a NEW object — the outbox rows are written by the caller inside a transaction,
     so this stays a pure function and is trivially testable.
     """
-    now = now or datetime.now(timezone.utc)
+    now = now or datetime.now(UTC)
     if to not in _ALLOWED[esc.state]:
         raise IllegalTransition(f"{esc.state.value} -> {to.value} is not a defined transition")
 
@@ -163,10 +163,10 @@ def transition(
 def is_exhausted(esc: Escalation, *, now: datetime | None = None) -> bool:
     """True once the retry budget is spent and the caregiver must be reached another way."""
     cfg = loader.remote_config()["escalation"]
-    now = now or datetime.now(timezone.utc)
+    now = now or datetime.now(UTC)
     if esc.created_at is None:
         return False
     created = esc.created_at
     if created.tzinfo is None:
-        created = created.replace(tzinfo=timezone.utc)
+        created = created.replace(tzinfo=UTC)
     return (now - created) > timedelta(days=cfg["max_retry_days"])

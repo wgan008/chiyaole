@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import json
 import os
-from functools import lru_cache
+from functools import cache
 from pathlib import Path
 from typing import Any
 
@@ -26,7 +26,7 @@ def data_dir() -> Path:
     return Path(__file__).resolve().parents[2] / "data"
 
 
-@lru_cache(maxsize=None)
+@cache
 def _load(name: str) -> dict[str, Any]:
     path = data_dir() / name
     if not path.exists():

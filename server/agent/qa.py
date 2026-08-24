@@ -158,7 +158,8 @@ def _deterministic(result: QueryResult) -> str:
         r = rows[0]
         where = r.get("hospital") or ""
         what = r.get("report_type") or "化验"
-        return f"最近一次是{_date(r.get('report_date'))}，在{where}做的{what}".replace("在做的", "做的")
+        sentence = f"最近一次是{_date(r.get('report_date'))}，在{where}做的{what}"
+        return sentence.replace("在做的", "做的")
 
     if result.intent == "med_taken_today":
         taken = [r for r in rows if r.get("action") == "taken"]

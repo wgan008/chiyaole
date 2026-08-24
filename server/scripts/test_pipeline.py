@@ -19,7 +19,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from agent import normalize, safety, schedule  # noqa: E402
 from agent.llm import LLMUnavailable  # noqa: E402
-from agent.types import Ambiguous, DailyRoutine, MedStatus, Medication  # noqa: E402
+from agent.types import Ambiguous, DailyRoutine, Medication, MedStatus  # noqa: E402
 from agent.vision import parse_medbox  # noqa: E402
 
 
@@ -48,7 +48,10 @@ def main(argv: list[str]) -> int:
         print(__doc__)
         return 1
 
-    print(f"=== Step 1: vision.parse_medbox + normalize.resolve_drug ({len(argv)} medication(s)) ===\n")
+    print(
+        f"=== Step 1: vision.parse_medbox + normalize.resolve_drug "
+        f"({len(argv)} medication(s)) ===\n"
+    )
     meds: list[Medication] = []
     parses = []
     for i, group in enumerate(argv, 1):
@@ -59,8 +62,13 @@ def main(argv: list[str]) -> int:
             return 1
         meds.append(med)
         parses.append(parsed)
-        resolved = f"-> {med.generic_code}" if med.generic_code else "-> UNRESOLVED (None, never guessed)"
-        print(f"[{i}] {parsed.generic_name!r} / {parsed.strength_value}{parsed.strength_unit or '?'} {resolved}")
+        resolved = (
+            f"-> {med.generic_code}" if med.generic_code else "-> UNRESOLVED (None, never guessed)"
+        )
+        print(
+            f"[{i}] {parsed.generic_name!r} / "
+            f"{parsed.strength_value}{parsed.strength_unit or '?'} {resolved}"
+        )
         if parsed.missing:
             print(f"    ⚠ missing: {parsed.missing}")
 
@@ -78,7 +86,10 @@ def main(argv: list[str]) -> int:
     print("\n=== Step 3: simulated caregiver confirmation ===\n")
     if blocked:
         print("★ Blocked — per spec, none of these are auto-confirmed. A human resolves the")
-        print("  alert first (docs/spec red line #2: AI parses, caregiver confirms, only then active).")
+        print(
+            "  alert first (docs/spec red line #2: AI parses, caregiver confirms, "
+            "only then active)."
+        )
     else:
         for med, parsed in zip(meds, parses, strict=True):
             med.status = MedStatus.ACTIVE

@@ -126,7 +126,10 @@ def _generate_doses(
 
 
 def _to_medbox_draft(med: Medication, photo_url: str | None) -> MedboxDraft:
-    missing = [f for f in ("generic_name", "strength_value", "usage_raw") if getattr(med, f) in (None, "")]
+    missing = [
+        f for f in ("generic_name", "strength_value", "usage_raw")
+        if getattr(med, f) in (None, "")
+    ]
     derived_times = None
     if med.status == "draft":
         preview = schedule.synthesize(_to_pydantic(med), DailyRoutine())
@@ -166,7 +169,10 @@ def _regimen_state(patient_id: str, session: Session) -> RegimenDraftOut:
             for m, asset in rows
         ],
         alerts=[
-            SafetyAlertOut(kind=a.kind.value, codes=a.codes, message=a.message, ask_doctor=a.ask_doctor, level=a.level)
+            SafetyAlertOut(
+                kind=a.kind.value, codes=a.codes, message=a.message,
+                ask_doctor=a.ask_doctor, level=a.level,
+            )
             for a in alerts
         ],
         blocked=safety.blocks_activation(alerts),
@@ -209,11 +215,15 @@ def parse_medbox_route(
 ) -> RegimenDraftOut:
     assets = list(
         session.scalars(
-            select(Asset).where(Asset.id.in_(body.asset_ids), Asset.patient_id == caregiver.patient_id)
+            select(Asset).where(
+                Asset.id.in_(body.asset_ids), Asset.patient_id == caregiver.patient_id
+            )
         )
     )
     if len(assets) != len(body.asset_ids):
-        raise HTTPException(status_code=404, detail="one or more asset_ids not found for this patient")
+        raise HTTPException(
+            status_code=404, detail="one or more asset_ids not found for this patient"
+        )
 
     # ★ file:// paths, not storage.url_for() — the vision call runs ON this machine and
     # can resolve/upload local files itself (confirmed live, scripts/test_vision.py); a

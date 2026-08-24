@@ -52,7 +52,9 @@ router = APIRouter(prefix="/api", tags=["device"])
 
 
 @router.post("/device/register")
-def register_device(body: DeviceRegisterRequest, session: Session = Depends(get_session)) -> DeviceRegisterOut:
+def register_device(
+    body: DeviceRegisterRequest, session: Session = Depends(get_session)
+) -> DeviceRegisterOut:
     patient = session.get(Patient, body.patient_id)
     if patient is None:
         raise HTTPException(status_code=404, detail="unknown patient_id")

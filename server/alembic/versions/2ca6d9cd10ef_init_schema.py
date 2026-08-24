@@ -7,18 +7,19 @@ Create Date: 2026-08-13 11:41:58.207936
 """
 from __future__ import annotations
 
-from typing import Sequence, Union
+from collections.abc import Sequence
 
-from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
+
 import app.models.base
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = '2ca6d9cd10ef'
-down_revision: Union[str, None] = None
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+down_revision: str | None = None
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
@@ -26,7 +27,9 @@ def upgrade() -> None:
     op.create_table('patients',
     sa.Column('id', app.models.base.GUID(length=36), nullable=False),
     sa.Column('display_name', sa.Text(), nullable=False),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
+    sa.Column(
+        'created_at', sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False
+    ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('assets',
@@ -36,7 +39,9 @@ def upgrade() -> None:
     sa.Column('oss_key', sa.Text(), nullable=False),
     sa.Column('masked_oss_key', sa.Text(), nullable=True),
     sa.Column('sha256', sa.Text(), nullable=False),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
+    sa.Column(
+        'created_at', sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False
+    ),
     sa.ForeignKeyConstraint(['patient_id'], ['patients.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -70,13 +75,19 @@ def upgrade() -> None:
     sa.Column('urgency', sa.Integer(), nullable=False),
     sa.Column('utterance_raw', sa.Text(), nullable=True),
     sa.Column('audio_asset_id', app.models.base.GUID(length=36), nullable=True),
-    sa.Column('context_json', postgresql.JSONB(astext_type=sa.Text()).with_variant(sa.Text(), 'sqlite'), nullable=True),
+    sa.Column(
+        'context_json',
+        postgresql.JSONB(astext_type=sa.Text()).with_variant(sa.Text(), 'sqlite'),
+        nullable=True,
+    ),
     sa.Column('state', sa.Text(), nullable=False),
     sa.Column('attempts', sa.Integer(), nullable=False),
     sa.Column('next_retry_at', sa.DateTime(timezone=True), nullable=True),
     sa.Column('reply_text', sa.Text(), nullable=True),
     sa.Column('reply_audio_id', app.models.base.GUID(length=36), nullable=True),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
+    sa.Column(
+        'created_at', sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False
+    ),
     sa.Column('delivered_at', sa.DateTime(timezone=True), nullable=True),
     sa.Column('answered_at', sa.DateTime(timezone=True), nullable=True),
     sa.Column('relayed_at', sa.DateTime(timezone=True), nullable=True),
@@ -85,7 +96,9 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['reply_audio_id'], ['assets.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_index('ix_escalations_state_retry', 'escalations', ['state', 'next_retry_at'], unique=False)
+    op.create_index(
+        'ix_escalations_state_retry', 'escalations', ['state', 'next_retry_at'], unique=False
+    )
     op.create_table('lab_items',
     sa.Column('id', app.models.base.GUID(length=36), nullable=False),
     sa.Column('report_id', app.models.base.GUID(length=36), nullable=False),
@@ -116,7 +129,9 @@ def upgrade() -> None:
     sa.Column('confirmed_by', app.models.base.GUID(length=36), nullable=True),
     sa.Column('confirmed_at', sa.DateTime(timezone=True), nullable=True),
     sa.Column('status', sa.Text(), nullable=False),
-    sa.CheckConstraint("status <> 'active' OR confirmed_at IS NOT NULL", name='active_requires_confirm'),
+    sa.CheckConstraint(
+        "status <> 'active' OR confirmed_at IS NOT NULL", name='active_requires_confirm'
+    ),
     sa.ForeignKeyConstraint(['confirmed_by'], ['caregivers.id'], ),
     sa.ForeignKeyConstraint(['patient_id'], ['patients.id'], ),
     sa.ForeignKeyConstraint(['photo_asset_id'], ['assets.id'], ),
@@ -152,7 +167,10 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['patient_id'], ['patients.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_index('ix_events_patient_tapped', 'confirmation_events', ['patient_id', 'tapped_at'], unique=False)
+    op.create_index(
+        'ix_events_patient_tapped', 'confirmation_events', ['patient_id', 'tapped_at'],
+        unique=False
+    )
     # ### end Alembic commands ###
 
 

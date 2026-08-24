@@ -16,6 +16,7 @@ is always a bound parameter, on every path, without exception.
 
 from __future__ import annotations
 
+from datetime import UTC
 from typing import Any
 
 from sqlalchemy import text
@@ -116,9 +117,9 @@ def last_report(session: Session, patient_id: str, slots: Slots) -> QueryResult:
 
 
 def med_taken_today(session: Session, patient_id: str, slots: Slots) -> QueryResult:
-    from datetime import datetime, time, timezone
+    from datetime import datetime, time
 
-    today = datetime.now(timezone.utc).date()
+    today = datetime.now(UTC).date()
     rows = _rows(
         session,
         _MED_TAKEN_TODAY,
