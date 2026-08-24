@@ -23,6 +23,13 @@ services:
     env_file: .env
     environment:
       DATABASE_URL: postgresql+psycopg://chiyaole:chiyaole@postgres:5432/chiyaole
+      # ★ agent/loader.py locates data/ via `Path(__file__).resolve().parents[2]`, tuned
+      # for local dev's <repo>/server/agent/loader.py nesting (2 levels up = repo root).
+      # server/Dockerfile copies the server code flat into /srv (agent/loader.py lands at
+      # /srv/agent/loader.py, one level shallower), so that same parents[2] math resolves
+      # to `/` instead of `/srv` inside the container — loader.py already supports this
+      # exact override, it just was never set for the container build.
+      CHIYAOLE_DATA_DIR: /srv/data
     depends_on:
       postgres:
         condition: service_healthy
