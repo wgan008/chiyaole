@@ -1,0 +1,25 @@
+name: deploy
+
+# ★ Fires immediately on every push to main, independent of ci.yml — deliberate choice
+# (not gated on lint/typecheck/tests passing first): fastest feedback loop for a solo POC,
+# at the cost of a broken push reaching the only server. If that trade stops being worth
+# it, add `needs:`/`workflow_run` on ci.yml's completion instead of removing this trigger.
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH in and redeploy
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.ECS_HOST }}
+          username: ${{ secrets.ECS_USER }}
+          key: ${{ secrets.ECS_SSH_KEY }}
+          script: |
+            set -e
+            cd ~/chiyaole
+            git pull
+            docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
