@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- docs/design/05_Technical_Spec_EN.md "Visual rules" + data/remote_config.json ui.colors.
+         Color never carries information alone — everything must still work in greyscale. -->
+    <color name="primary_green">#0B6B33</color>   <!-- 7.4:1 against white, AAA -->
+    <color name="brand_yellow">#FFD500</color>    <!-- 15:1 against true_black -->
+    <color name="true_black">#0A0A0A</color>
+    <color name="white">#FFFFFF</color>
+    <color name="skip_grey">#5A5A5A</color>
+    <color name="alert_red">#B3261E</color>
+</resources>

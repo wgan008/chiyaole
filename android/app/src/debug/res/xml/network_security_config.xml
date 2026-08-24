@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Debug-variant only — release keeps usesCleartextTraffic="false" with no exceptions.
+     10.0.2.2 is the Android emulator's alias for the host machine, used to reach a local
+     dev server (spec §3.1 requires HTTPS in every real deployment; this exists only so a
+     laptop-local FastAPI instance is reachable from the emulator during development). -->
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">10.0.2.2</domain>
+    </domain-config>
+</network-security-config>

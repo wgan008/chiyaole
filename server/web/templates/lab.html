@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% block title %}化验单 - 吃药了{% endblock %}
+{% block content %}
+<h1>拍化验单</h1>
+<p class="hint">竖着拿手机，四个角都要拍进去，纸压平一点，别在灯正下方拍。<br>
+  生化全套常有 2-3 页，可以一页一页拍。识别只是把单子上的数字读出来，
+  不会判断"这个高了要紧不要紧" — 只做转录、对比、放大这三件事。</p>
+
+<div id="thumbs" class="box-thumb-row"></div>
+
+<div id="captureTile" class="capture-tile">
+  <div class="plus">＋</div>
+  <div class="lbl">拍下一页</div>
+  <div class="sub">点这里调起相机</div>
+</div>
+<input type="file" id="fileInput" accept="image/*" capture="environment" style="display:none">
+
+<div style="margin-top:16px" id="identifyRow"></div>
+<div id="msg" class="msg"></div>
+
+<div id="reportsList" style="margin-top:24px"></div>
+{% endblock %}
+{% block scripts %}
+<script>
+// ★ Wireframe D1f (capture, multi-page) + D6 (transcribe/compare/enlarge — never a medical
+// judgement, see agent/vision.py's parse_lab prompt and README's "lines this product does
+// not cross" #1). One page instead of D1f/D6 as two separate screens: lab reports are a
+// smaller, less frequent flow than medications, and a caregiver reviewing right after
+// capture is the common case.
+let pages = [];
+
+const thumbsEl = document.getElementById("thumbs");
+const captureTile = document.getElementById("captureTile");
+const fileInput = document.getElementById("fileInput");
+const identifyRow = document.getElementById("identifyRow");
+const msgEl = document.getElementById("msg");
+const reportsListEl = document.getElementById("reportsList");
+
+captureTile.addEventListener("click", () => fileInput.click());
+
+fileInput.addEventListener("change", () => {
+  const file = fileInput.files[0];
+  fileInput.value = "";
+  if (!file) return;
+  pages.push(file);
+  renderThumbs();
+  renderIdentifyRow();
+});
+
+function renderThumbs() {
+  thumbsEl.innerHTML = pages.map((file, i) => `
+    <div class="box-thumb">
+      <div class="imgbox"><img src="${URL.createObjectURL(file)}" alt=""></div>
+      <div class="box-thumb-label">第 ${i + 1} 页</div>
+    </div>`).join("");
+}
+
+function renderIdentifyRow() {
+  identifyRow.innerHTML = pages.length
+    ? `<button id="identifyBtn">${pages.length} 页拍完了，识别</button>`
+    : "";
+  const btn = document.getElementById("identifyBtn");
+  if (btn) btn.addEventListener("click", identify);
+}
+
+async function identify() {
+  const btn = document.getElementById("identifyBtn");
+  btn.disabled = true;
+  showMsg(msgEl, "正在识别…", "");
+  try {
+    const assetIds = [];
+    for (const file of pages) {
+      const form = new FormData();
+      form.append("kind", "lab");
+      form.append("file", file);
+      const asset = await apiPostForm("/api/assets", form);
+      assetIds.push(asset.asset_id);
+    }
+    await apiPostJson("/api/parse/lab", { asset_ids: assetIds });
+    pages = [];
+    renderThumbs();
+    renderIdentifyRow();
+    showMsg(msgEl, "识别完成，见下方。", "ok");
+    await load();
+  } catch (err) {
+    showMsg(msgEl, `识别失败：${err.message}`, "error");
+    btn.disabled = false;
+  }
+}
+
+async function load() {
+  const data = await apiGet("/api/lab/reports");
+  renderReports(data.reports);
+}
+
+function renderReports(reports) {
+  if (!reports.length) {
+    reportsListEl.innerHTML = "";
+    return;
+  }
+  reportsListEl.innerHTML = reports.map(reportHtml).join("");
+
+  reports.forEach(report => {
+    if (report.confirmed) return;
+    const card = document.getElementById(`report-${report.report_id}`);
+    card.querySelector(".confirm-report-btn").addEventListener("click", () => confirmReport(report));
+    card.querySelector(".delete-report-btn").addEventListener("click", () => deleteReport(report.report_id));
+  });
+}
+
+function reportHtml(report) {
+  const title = `${report.report_date}${report.report_type ? " " + report.report_type : ""}`;
+  const sub = report.hospital || "";
+  const rows = report.items.map(item => itemRowHtml(item, report.confirmed)).join("");
+  const photos = report.photo_urls.length
+    ? `<div class="hint" style="margin-top:8px">
+         ${report.photo_urls.map(u => `<a href="${u}" target="_blank">查看原图</a>`).join(" · ")}
+       </div>`
+    : "";
+  const actions = report.confirmed
+    ? `<span class="flag f-go">已确认</span>`
+    : `<div style="margin-top:12px; display:flex; gap:8px">
+         <button class="confirm-report-btn">确认这份报告</button>
+         <button class="btn-ghost delete-report-btn" type="button">这份不要了</button>
+       </div>`;
+
+  return `
+    <div class="card" id="report-${report.report_id}" data-report-id="${report.report_id}">
+      <div class="wizard-bar" style="margin:-16px -16px 12px;border-radius:8px 8px 0 0">
+        ${title}${sub ? " · " + sub : ""}
+      </div>
+      <table class="field-table">
+        <tr><th>项目</th><th>这次</th><th>上次</th><th>参考范围</th></tr>
+        ${rows}
+      </table>
+      ${photos}
+      ${actions}
+      <div class="msg" id="reportMsg-${report.report_id}"></div>
+    </div>`;
+}
+
+function itemRowHtml(item, confirmed) {
+  const flagColor = item.flag === "H" || item.flag === "L" ? "var(--stop)" : "inherit";
+  const range = item.ref_low != null && item.ref_high != null ? `${item.ref_low}–${item.ref_high}` : "";
+  const thisTime = confirmed
+    ? `<b style="color:${flagColor}">${item.value ?? "—"}${item.flag && item.flag !== "N" ? " " + item.flag : ""}</b>`
+    : `<input type="text" class="item-value" data-item-id="${item.item_id}" style="width:70px" value="${item.value ?? ""}">`;
+  const prev = item.previous_value != null ? item.previous_value : "—";
+  return `
+    <tr>
+      <td>${item.raw_name}${item.code == null ? ` <span class="warn-note">⚠ 未识别</span>` : ""}</td>
+      <td>${thisTime}<span class="hint" style="display:block;margin:0">${item.unit || ""}</span></td>
+      <td>${prev}</td>
+      <td>${range}</td>
+    </tr>`;
+}
+
+async function confirmReport(report) {
+  const msgEl2 = document.getElementById(`reportMsg-${report.report_id}`);
+  const card = document.getElementById(`report-${report.report_id}`);
+  const items = Array.from(card.querySelectorAll(".item-value")).map(input => ({
+    item_id: input.dataset.itemId,
+    value: input.value === "" ? null : parseFloat(input.value),
+  }));
+  try {
+    const data = await apiPostJson(`/api/lab/${report.report_id}/confirm`, { confirmed: true, items });
+    renderReports(data.reports);
+  } catch (err) {
+    showMsg(msgEl2, `确认失败：${err.message}`, "error");
+  }
+}
+
+async function deleteReport(reportId) {
+  if (!confirm("确定不要这份报告了吗？")) return;
+  const data = await apiDelete(`/api/lab/${reportId}`);
+  renderReports(data.reports);
+}
+
+load();
+</script>
+{% endblock %}

@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>吃药了 · 命名与图标设计</title>
+<style>
+  :root{
+    --ink:#1a1d21;--ink2:#40474f;--mute:#7b838c;--line:#e0e4e8;--panel:#f6f7f9;
+    --acc:#0f766e;--acc-bg:#e6f4f2;--stop:#b02a2a;--stop-bg:#fbeeed;
+    --warn:#9a6200;--warn-bg:#fdf7ec;--ok:#1a6b3c;--ok-bg:#ecf7f0;
+    --brand:#FFD500;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:#fff;color:var(--ink);font-size:15px;line-height:1.75;
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .wrap{max-width:1080px;margin:0 auto;padding:52px 30px 90px}
+  header{border-bottom:3px solid var(--ink);padding-bottom:20px;margin-bottom:6px}
+  h1{font-size:29px;margin:0 0 6px;font-weight:700;letter-spacing:-.4px}
+  .sub{color:var(--mute);font-size:13.5px}
+  h2{font-size:19px;margin:52px 0 4px;padding-top:20px;border-top:1px solid var(--line);font-weight:700}
+  h2 .n{color:var(--acc);margin-right:9px}
+  h3{font-size:15px;margin:26px 0 6px;font-weight:700}
+  h4{font-size:13.5px;margin:18px 0 4px;font-weight:700;color:var(--ink2)}
+  .lead{color:var(--ink2);font-size:14.5px;margin:5px 0 14px}
+  p{margin:9px 0}
+  table{width:100%;border-collapse:collapse;font-size:13px;margin:14px 0}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:var(--panel);font-size:12px;color:var(--ink2);font-weight:600}
+  code{background:var(--panel);padding:1px 5px;border-radius:3px;font-size:12.5px;
+       font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  .box{border-left:3px solid var(--acc);background:var(--acc-bg);padding:12px 16px;
+       margin:16px 0;border-radius:0 5px 5px 0;font-size:13.5px}
+  .box.red{border-color:var(--stop);background:var(--stop-bg)}
+  .box.warn{border-color:var(--warn);background:var(--warn-bg)}
+  .box .lbl{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;
+            color:var(--acc);margin-bottom:2px}
+  .box.red .lbl{color:var(--stop)}.box.warn .lbl{color:var(--warn)}
+  .box p{margin:4px 0}
+  .tag{display:inline-block;padding:1px 7px;border-radius:3px;font-size:11.5px;font-weight:700}
+  .t-ok{background:var(--ok-bg);color:var(--ok)}
+  .t-no{background:var(--stop-bg);color:var(--stop)}
+  .t-w{background:var(--warn-bg);color:var(--warn)}
+
+  .hero{display:flex;gap:34px;align-items:center;flex-wrap:wrap;margin:26px 0 10px;
+        background:var(--panel);border-radius:12px;padding:26px 30px}
+  .hero .names{flex:1;min-width:250px}
+  .nm-cn{font-size:44px;font-weight:800;letter-spacing:3px;line-height:1.15;margin:0}
+  .nm-en{font-size:20px;color:var(--ink2);font-weight:600;margin:4px 0 0;letter-spacing:.5px}
+  .nm-repo{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13.5px;
+           color:var(--mute);margin-top:8px}
+
+  .row{display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start;margin:16px 0}
+  .cell{text-align:center}
+  .cell .cl{font-size:11.5px;color:var(--mute);margin-top:7px;line-height:1.5}
+  .cell .cl b{color:var(--ink2);display:block;font-size:12.5px}
+
+  .swatch{display:flex;gap:14px;flex-wrap:wrap;margin:12px 0}
+  .sw{border:1px solid var(--line);border-radius:8px;overflow:hidden;width:158px}
+  .sw .band{height:52px;display:flex;align-items:center;justify-content:center;
+            font-weight:800;font-size:15px}
+  .sw .meta{padding:7px 9px;font-size:11px;color:var(--mute);line-height:1.55}
+  .sw .meta b{color:var(--ink);font-size:12px;display:block;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+
+  .sim{background:var(--panel);border-radius:10px;padding:18px 20px;margin:14px 0}
+  .simrow{display:flex;gap:20px;flex-wrap:wrap;justify-content:flex-start}
+  .simcell{text-align:center;width:118px}
+  .simcell .lab{font-size:11.5px;font-weight:700;margin-top:7px}
+  .simcell .dsc{font-size:10.5px;color:var(--mute);line-height:1.5;margin-top:1px}
+  .frame{width:118px;height:118px;border-radius:14px;overflow:hidden;
+         background:#dfe6ee;display:flex;align-items:center;justify-content:center}
+
+  .bad{position:relative}
+  .bad::after{content:"✕";position:absolute;top:-6px;right:-6px;width:24px;height:24px;
+    background:var(--stop);color:#fff;border-radius:50%;font-size:14px;font-weight:700;
+    display:flex;align-items:center;justify-content:center;box-shadow:0 1px 5px rgba(0,0,0,.25)}
+  .good{position:relative}
+  .good::after{content:"✓";position:absolute;top:-6px;right:-6px;width:24px;height:24px;
+    background:var(--ok);color:#fff;border-radius:50%;font-size:14px;font-weight:700;
+    display:flex;align-items:center;justify-content:center;box-shadow:0 1px 5px rgba(0,0,0,.25)}
+
+  .home{width:210px;background:#dfe6ee;border:7px solid #24272c;border-radius:20px;padding:14px 11px}
+  .homegrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px 9px}
+  .app{text-align:center}
+  .app .ic{height:44px;border-radius:11px}
+  .app .nmm{font-size:9.5px;margin-top:3px;color:#2b333b}
+
+  footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);font-size:12px;color:var(--mute)}
+  @media(max-width:760px){.wrap{padding:30px 16px 60px} .nm-cn{font-size:34px}}
+  @media print{.wrap{padding:0;max-width:none} h2{page-break-after:avoid}}
+</style>
+</head>
+<body>
+
+<!-- ============ SVG 滤镜：视觉障碍模拟 ============ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <!-- 绿色盲/绿色弱 Deuteranopia -->
+    <filter id="deuter">
+      <feColorMatrix type="matrix" values="
+        0.625 0.375 0     0 0
+        0.700 0.300 0     0 0
+        0     0.300 0.700 0 0
+        0     0     0     1 0"/>
+    </filter>
+    <!-- 红色盲 Protanopia -->
+    <filter id="protan">
+      <feColorMatrix type="matrix" values="
+        0.567 0.433 0     0 0
+        0.558 0.442 0     0 0
+        0     0.242 0.758 0 0
+        0     0     0     1 0"/>
+    </filter>
+    <!-- 白内障：晶状体黄化（吸蓝光）+ 散射（雾化）+ 对比下降 -->
+    <filter id="cataract">
+      <feColorMatrix type="matrix" values="
+        1.00 0.10 0.00 0 0.04
+        0.06 0.94 0.00 0 0.04
+        0.00 0.10 0.55 0 0.10
+        0    0    0    1 0"/>
+      <feGaussianBlur stdDeviation="1.6"/>
+      <feComponentTransfer>
+        <feFuncR type="linear" slope="0.78" intercept="0.17"/>
+        <feFuncG type="linear" slope="0.78" intercept="0.17"/>
+        <feFuncB type="linear" slope="0.78" intercept="0.15"/>
+      </feComponentTransfer>
+    </filter>
+    <!-- 弱视：显著模糊 -->
+    <filter id="lowvision"><feGaussianBlur stdDeviation="3.4"/></filter>
+    <!-- 白内障 + 弱视 叠加（最坏情况） -->
+    <filter id="worst">
+      <feColorMatrix type="matrix" values="
+        1.00 0.10 0.00 0 0.04
+        0.06 0.94 0.00 0 0.04
+        0.00 0.10 0.55 0 0.10
+        0    0    0    1 0"/>
+      <feComponentTransfer>
+        <feFuncR type="linear" slope="0.70" intercept="0.24"/>
+        <feFuncG type="linear" slope="0.70" intercept="0.24"/>
+        <feFuncB type="linear" slope="0.70" intercept="0.22"/>
+      </feComponentTransfer>
+      <feGaussianBlur stdDeviation="4"/>
+    </filter>
+  </defs>
+</svg>
+
+<!-- ============ 可复用图标符号 ============ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <!-- 主方案：黄底黑字 -->
+    <symbol id="ico" viewBox="0 0 192 192">
+      <rect x="3" y="3" width="186" height="186" rx="44" fill="#FFD500"
+            stroke="#141414" stroke-width="6"/>
+      <text x="96" y="82" text-anchor="middle" font-size="76" font-weight="700"
+            fill="#0a0a0a" stroke="#0a0a0a" stroke-width="3.2"
+            font-family="'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif">吃</text>
+      <text x="96" y="163" text-anchor="middle" font-size="76" font-weight="700"
+            fill="#0a0a0a" stroke="#0a0a0a" stroke-width="3.2"
+            font-family="'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif">药</text>
+    </symbol>
+    <!-- 否决A：蓝底白字 -->
+    <symbol id="icoBlue" viewBox="0 0 192 192">
+      <rect x="3" y="3" width="186" height="186" rx="44" fill="#2b6cb0"/>
+      <text x="96" y="82" text-anchor="middle" font-size="76" font-weight="700" fill="#fff"
+            font-family="'PingFang SC','Microsoft YaHei',sans-serif">吃</text>
+      <text x="96" y="163" text-anchor="middle" font-size="76" font-weight="700" fill="#fff"
+            font-family="'PingFang SC','Microsoft YaHei',sans-serif">药</text>
+    </symbol>
+    <!-- 否决B：药丸图形 -->
+    <symbol id="icoPill" viewBox="0 0 192 192">
+      <rect x="3" y="3" width="186" height="186" rx="44" fill="#fff" stroke="#d0d5da" stroke-width="3"/>
+      <g transform="rotate(-40 96 96)">
+        <rect x="52" y="76" width="88" height="40" rx="20" fill="none" stroke="#12a150" stroke-width="5"/>
+        <line x1="96" y1="76" x2="96" y2="116" stroke="#12a150" stroke-width="5"/>
+      </g>
+      <circle cx="96" cy="150" r="4" fill="#12a150"/>
+    </symbol>
+    <!-- 否决C：红绿双色语义 -->
+    <symbol id="icoRG" viewBox="0 0 192 192">
+      <rect x="3" y="3" width="186" height="186" rx="44" fill="#12a150"/>
+      <circle cx="96" cy="96" r="52" fill="#c0392b"/>
+      <text x="96" y="118" text-anchor="middle" font-size="58" font-weight="700" fill="#12a150"
+            font-family="'PingFang SC','Microsoft YaHei',sans-serif">药</text>
+    </symbol>
+    <!-- 通知栏单色图标 -->
+    <symbol id="icoMono" viewBox="0 0 192 192">
+      <text x="96" y="140" text-anchor="middle" font-size="150" font-weight="700"
+            fill="#fff" stroke="#fff" stroke-width="4"
+            font-family="'PingFang SC','Microsoft YaHei',sans-serif">药</text>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="wrap">
+
+<header>
+  <h1>命名与图标设计</h1>
+  <div class="sub">面向 <b>弱视 · 色弱 · 白内障</b> 的可识别性优先设计 ｜ 2026-08</div>
+</header>
+
+<!-- ============ 1 命名 ============ -->
+<h2><span class="n">01</span>命名</h2>
+
+<div class="hero">
+  <svg width="118" height="118"><use href="#ico"/></svg>
+  <div class="names">
+    <p class="nm-cn">吃药了</p>
+    <p class="nm-en">ChiYaoLe　<span style="color:var(--mute);font-weight:400;font-size:16px">
+      — Time for Your Meds</span></p>
+    <div class="nm-repo">github.com/&lt;you&gt;/<b style="color:var(--ink2)">chiyaole</b>　·
+      图标文字「吃药」　·　桌面标签「吃药了」</div>
+  </div>
+</div>
+
+<h3>为什么是「吃药了」</h3>
+<table>
+  <tr><th style="width:130px">标准</th><th>说明</th></tr>
+  <tr><td><b>它是家人真会说的那句话</b></td>
+    <td>不是产品名，是老伴儿在厨房喊的那一声。<b>温度来自它本来就存在于生活里</b>，
+      不是设计出来的</td></tr>
+  <tr><td><b>老人听一遍就记住</b></td>
+    <td>三个字、全是常用字、无外来词、无谐音梗。
+      他会指着屏幕说"我点那个<b>吃药</b>"——<b>名字就是使用说明</b></td></tr>
+  <tr><td><b>图标只需两个字</b></td>
+    <td>「吃药」两字上下排，每字可占图标近一半高度。<b>字越少，字越大</b></td></tr>
+  <tr><td><b>不像医院、不像监控</b></td>
+    <td>没有"健康""管家""守护""监测"这类词——
+      带"守护/监护"的名字会让老人立刻警觉<b>"你们在看着我"</b></td></tr>
+</table>
+
+<div class="box warn">
+  <div class="lbl">一个被主动放弃的东西：温情</div>
+  <p>更暖的名字（「安心」「常伴」「记得吃」）都考虑过，最后都放弃了。
+  原因是——<b>对这个人群，「看懂」压倒「好听」</b>。</p>
+  <p>一个 78 岁、有白内障的人，在一屏 12 个图标里要一眼找到它。
+  「安心」这两个字不告诉他任何事，<b>「吃药」告诉他全部</b>。
+  情感价值应该来自产品做了什么（那句"我已经告诉你女儿了"），<b>而不是来自名字</b>。</p>
+</div>
+
+<h3>备选与否决理由</h3>
+<table>
+  <tr><th style="width:110px">候选</th><th style="width:76px">判断</th><th>理由</th></tr>
+  <tr><td><b>吃药了</b></td><td><span class="tag t-ok">采用</span></td>
+    <td>口语、指向明确、两字图标</td></tr>
+  <tr><td>记得吃</td><td><span class="tag t-w">次选</span></td>
+    <td>更柔和，但"吃什么"不明确；图标三字或缩为「记得」，语义变弱</td></tr>
+  <tr><td>小药盒</td><td><span class="tag t-no">否</span></td>
+    <td>把产品自我定义成硬件的替代品——而<b>我们恰恰不该在药盒那一层竞争</b></td></tr>
+  <tr><td>健康管家 / 守护</td><td><span class="tag t-no">否</span></td>
+    <td>"守护/监护"直接触发老人的被监视感，<b>是这类产品最常见的自杀式命名</b></td></tr>
+  <tr><td>爸妈的药</td><td><span class="tag t-no">否</span></td>
+    <td>子女视角。装在老人手机上，他看到的应该是<b>他自己的说法</b></td></tr>
+</table>
+
+<h4>英文名</h4>
+<p><code>chiyaole</code> 作为 repo 名：可搜索、独特、自带故事——
+README 第一行解释它的意思是"time to take your medicine"，<b>本身就是一个好的开场钩子</b>。
+对外正式名写作 <b>ChiYaoLe — Time for Your Meds</b>。
+不用 PillTime / MedMinder 一类通用词，那些既撞名又丢掉了地域语境。</p>
+
+<!-- ============ 2 图标 ============ -->
+<h2><span class="n">02</span>图标</h2>
+<p class="lead">设计目标只有一个：<b>让一位有白内障、红绿色弱、视力 0.3 的老人，
+在一屏图标里一眼找到它。</b></p>
+
+<div class="row" style="align-items:flex-end">
+  <div class="cell"><svg width="152" height="152"><use href="#ico"/></svg>
+    <div class="cl"><b>192dp</b>主图标</div></div>
+  <div class="cell"><svg width="96" height="96"><use href="#ico"/></svg>
+    <div class="cl"><b>96dp</b>桌面常见尺寸</div></div>
+  <div class="cell"><svg width="64" height="64"><use href="#ico"/></svg>
+    <div class="cl"><b>64dp</b></div></div>
+  <div class="cell"><svg width="44" height="44"><use href="#ico"/></svg>
+    <div class="cl"><b>44dp</b>最小仍可辨</div></div>
+  <div class="cell" style="margin-left:10px">
+    <div style="background:#3a3f45;border-radius:8px;padding:9px 11px">
+      <svg width="26" height="26"><use href="#icoMono"/></svg></div>
+    <div class="cl"><b>通知栏</b>单色「药」</div></div>
+</div>
+
+<h3>三条核心决策</h3>
+<table>
+  <tr><th style="width:132px">决策</th><th>依据</th></tr>
+  <tr><td><b>用汉字，不用图形</b></td>
+    <td>药丸、胶囊、十字这些图形在小尺寸 + 白内障雾化下会糊成一团，而且和别的健康 App 撞脸。
+      <b>汉字是这个人群识别度最高的符号——他们读了七十年</b></td></tr>
+  <tr><td><b>亮黄底 + 纯黑字</b></td>
+    <td>亮度对比 <b>≈ 15:1</b>（WCAG AAA 门槛是 7:1）。
+      而且<b>白内障的黄化晶状体几乎不吸收黄光</b>，透过率最高</td></tr>
+  <tr><td><b>形状与亮度承载信息，<br>颜色不承载</b></td>
+    <td>红绿色弱约影响 <b>8% 男性</b>。<b>即使完全去掉颜色（灰度），这个图标依然可读</b>——
+      这是唯一可靠的做法</td></tr>
+</table>
+
+<h3>色卡与对比度</h3>
+<div class="swatch">
+  <div class="sw"><div class="band" style="background:#FFD500;color:#0a0a0a">吃药</div>
+    <div class="meta"><b>#FFD500 / #0A0A0A</b>主色 · 对比 ≈ 15:1 <span class="tag t-ok">AAA</span></div></div>
+  <div class="sw"><div class="band" style="background:#141414;color:#FFD500">描边</div>
+    <div class="meta"><b>#141414</b> 6dp 外描边<br>防止浅色壁纸上边界消失</div></div>
+  <div class="sw"><div class="band" style="background:#0B6B33;color:#fff">吃了</div>
+    <div class="meta"><b>#0B6B33</b>主按钮（<b>已加深</b>）<br>白字对比 ≈ 7.4:1 <span class="tag t-ok">AAA</span></div></div>
+  <div class="sw"><div class="band" style="background:#12A150;color:#fff">吃了</div>
+    <div class="meta"><b>#12A150</b>原绿色<br>白字对比 ≈ 3.4:1 <span class="tag t-w">偏低</span></div></div>
+</div>
+
+<div class="box red">
+  <div class="lbl">顺带发现：wireframe 里的绿色按钮要加深</div>
+  <p>原按钮 <code>#12A150</code> 配白字，对比度只有约 <b>3.4:1</b>——
+  靠字号大（40sp）勉强过 WCAG 大字标准，但<b>对白内障人群明显不够</b>。</p>
+  <p>改成 <code>#0B6B33</code>：<b>语义完全不变（还是绿的"可以按"），对比度翻倍到 ≈7.4:1。</b>
+  零成本改动，建议直接采纳。</p>
+</div>
+
+<!-- ============ 3 模拟 ============ -->
+<h2><span class="n">03</span>视觉障碍模拟</h2>
+<p class="lead">下面全部是同一个 SVG，只叠加了不同的视觉滤镜。
+<b>判断标准：在最坏一档里，「吃药」两个字还认得出吗。</b></p>
+
+<div class="sim">
+  <div class="simrow">
+    <div class="simcell"><div class="frame"><svg width="96" height="96"><use href="#ico"/></svg></div>
+      <div class="lab">正常视力</div><div class="dsc">基准</div></div>
+    <div class="simcell"><div class="frame"><svg width="96" height="96" style="filter:url(#deuter)">
+      <use href="#ico"/></svg></div>
+      <div class="lab">绿色弱</div><div class="dsc">约 6% 男性</div></div>
+    <div class="simcell"><div class="frame"><svg width="96" height="96" style="filter:url(#protan)">
+      <use href="#ico"/></svg></div>
+      <div class="lab">红色盲</div><div class="dsc">约 1–2% 男性</div></div>
+    <div class="simcell"><div class="frame"><svg width="96" height="96" style="filter:url(#cataract)">
+      <use href="#ico"/></svg></div>
+      <div class="lab">白内障</div><div class="dsc">黄化 + 雾化 + 低对比</div></div>
+    <div class="simcell"><div class="frame"><svg width="96" height="96" style="filter:url(#lowvision)">
+      <use href="#ico"/></svg></div>
+      <div class="lab">弱视</div><div class="dsc">重度模糊</div></div>
+    <div class="simcell"><div class="frame" style="outline:2px solid var(--stop);outline-offset:2px">
+      <svg width="96" height="96" style="filter:url(#worst)"><use href="#ico"/></svg></div>
+      <div class="lab" style="color:var(--stop)">白内障+弱视</div>
+      <div class="dsc"><b>最坏情况</b></div></div>
+  </div>
+  <p style="font-size:12.5px;color:var(--ink2);margin:14px 0 0">
+    在最右一档里，字形细节已经丢失——但<b>「亮黄方块 + 中间两团黑」这个整体形态依然独一无二</b>。
+    这正是设计目标：<b>不指望他读清笔画，只要求他一眼认出"就是那个黄的"。</b>
+  </p>
+</div>
+
+<h3>放进真实桌面看</h3>
+<div class="row">
+  <div class="cell">
+    <div class="home">
+      <div class="homegrid">
+        <div class="app"><div class="ic" style="background:#5cb85c"></div><div class="nmm">微信</div></div>
+        <div class="app"><div class="ic" style="background:#4a90d9"></div><div class="nmm">电话</div></div>
+        <div class="app"><div class="ic" style="background:#e8a33d"></div><div class="nmm">相机</div></div>
+        <div class="app"><div class="ic" style="padding:0"><svg width="44" height="44" style="display:block">
+          <use href="#ico"/></svg></div><div class="nmm" style="font-weight:700">吃药了</div></div>
+        <div class="app"><div class="ic" style="background:#c94f4f"></div><div class="nmm">头条</div></div>
+        <div class="app"><div class="ic" style="background:#8e7cc3"></div><div class="nmm">设置</div></div>
+        <div class="app"><div class="ic" style="background:#3aa8a0"></div><div class="nmm">支付宝</div></div>
+        <div class="app"><div class="ic" style="background:#d9534f"></div><div class="nmm">淘宝</div></div>
+        <div class="app"><div class="ic" style="background:#6b7d8c"></div><div class="nmm">天气</div></div>
+      </div>
+    </div>
+    <div class="cl" style="margin-top:8px"><b>正常视力</b></div>
+  </div>
+  <div class="cell">
+    <div style="filter:url(#worst)">
+      <div class="home">
+        <div class="homegrid">
+          <div class="app"><div class="ic" style="background:#5cb85c"></div><div class="nmm">微信</div></div>
+          <div class="app"><div class="ic" style="background:#4a90d9"></div><div class="nmm">电话</div></div>
+          <div class="app"><div class="ic" style="background:#e8a33d"></div><div class="nmm">相机</div></div>
+          <div class="app"><div class="ic" style="padding:0"><svg width="44" height="44" style="display:block">
+            <use href="#ico"/></svg></div><div class="nmm" style="font-weight:700">吃药了</div></div>
+          <div class="app"><div class="ic" style="background:#c94f4f"></div><div class="nmm">头条</div></div>
+          <div class="app"><div class="ic" style="background:#8e7cc3"></div><div class="nmm">设置</div></div>
+          <div class="app"><div class="ic" style="background:#3aa8a0"></div><div class="nmm">支付宝</div></div>
+          <div class="app"><div class="ic" style="background:#d9534f"></div><div class="nmm">淘宝</div></div>
+          <div class="app"><div class="ic" style="background:#6b7d8c"></div><div class="nmm">天气</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="cl" style="margin-top:8px"><b>白内障 + 弱视</b></div>
+  </div>
+  <div class="cell" style="flex:1;min-width:230px;text-align:left">
+    <div class="box" style="margin-top:0">
+      <div class="lbl">这张对比才是验收标准</div>
+      <p>单看图标好不好看没有意义。<b>要看的是：在一屏九个图标里，它是不是唯一那个还认得出的。</b></p>
+      <p>右图里，微信的绿和淘宝的红都糊成了相近的暗块，
+      而<b>亮黄那一格的亮度显著高于周围全部图标</b>——
+      这不是靠色相，是靠<b>亮度</b>，而亮度是所有色觉障碍都保留的通道。</p>
+    </div>
+    <div class="box warn">
+      <div class="lbl">装机时的配套动作</div>
+      <p>图标再好，也要<b>放在第一屏、微信旁边</b>（见 wireframe D3 装机交接）。
+      对这个人群，<b>位置和图标同等重要</b>——他记的是"微信右边那个黄的"。</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 4 否决 ============ -->
+<h2><span class="n">04</span>被否决的三个方案</h2>
+<div class="row">
+  <div class="cell">
+    <div class="bad" style="display:inline-block"><svg width="104" height="104"><use href="#icoBlue"/></svg></div>
+    <div class="frame" style="width:104px;height:104px;margin-top:8px;border-radius:12px">
+      <svg width="88" height="88" style="filter:url(#worst)"><use href="#icoBlue"/></svg></div>
+    <div class="cl"><b>A · 蓝底白字</b>白内障下直接塌掉</div>
+  </div>
+  <div class="cell">
+    <div class="bad" style="display:inline-block"><svg width="104" height="104"><use href="#icoPill"/></svg></div>
+    <div class="frame" style="width:104px;height:104px;margin-top:8px;border-radius:12px">
+      <svg width="88" height="88" style="filter:url(#worst)"><use href="#icoPill"/></svg></div>
+    <div class="cl"><b>B · 药丸线条图形</b>细线条最先消失</div>
+  </div>
+  <div class="cell">
+    <div class="bad" style="display:inline-block"><svg width="104" height="104"><use href="#icoRG"/></svg></div>
+    <div class="frame" style="width:104px;height:104px;margin-top:8px;border-radius:12px">
+      <svg width="88" height="88" style="filter:url(#worst)"><use href="#icoRG"/></svg></div>
+    <div class="cl"><b>C · 红绿双色</b>色弱者看成一整块</div>
+  </div>
+  <div class="cell" style="flex:1;min-width:250px;text-align:left">
+    <table style="margin-top:0">
+      <tr><th style="width:64px">方案</th><th>为什么不行</th></tr>
+      <tr><td><b>A 蓝底</b></td>
+        <td><b>白内障的黄化晶状体大量吸收蓝光</b>。蓝色变暗、变浑，和黑色边框糊在一起——
+          这是最典型的适老化错误，而蓝色恰恰是科技产品最爱用的颜色</td></tr>
+      <tr><td><b>B 药丸</b></td>
+        <td>线条宽度 5dp，在雾化 + 缩小后<b>最先消失</b>。
+          而且药丸图形和市面上一堆健康 App 撞脸——<b>老人分不出哪个是哪个</b></td></tr>
+      <tr><td><b>C 红绿</b></td>
+        <td>依赖<b>红绿色相差异</b>传达信息。对绿色弱者，红和绿的亮度接近，
+          整个图标塌成一块均匀色斑，中间的「药」字彻底消失</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="box">
+  <div class="lbl">一条可以带走的通用规则</div>
+  <p><b>把设计转成灰度看一眼。</b>如果灰度下还认得出，
+  那么所有色觉障碍人群都认得出——因为<b>亮度是唯一被全部色觉障碍保留的通道</b>。
+  这一条比记住任何色卡都有用。</p>
+</div>
+
+<!-- ============ 5 规格 ============ -->
+<h2><span class="n">05</span>交付规格</h2>
+<table>
+  <tr><th style="width:150px">项</th><th>规格</th></tr>
+  <tr><td>主色 / 字色</td><td><code>#FFD500</code> / <code>#0A0A0A</code>，对比 ≈ 15:1</td></tr>
+  <tr><td>外描边</td><td><code>#141414</code>，6dp（192 画布）。<b>必须有</b>——浅色壁纸上黄色会失去边界</td></tr>
+  <tr><td>圆角</td><td>44/192 ≈ 23%，接近安卓 squircle</td></tr>
+  <tr><td>字重</td><td>Heavy / 900。若字体无 Heavy，用 <b>同色描边 3dp 加粗</b>（本文件即此法）</td></tr>
+  <tr><td>排布</td><td>「吃」「药」<b>上下两行</b>——方形画布里每字可占近半高，比左右排更大</td></tr>
+  <tr><td>安卓自适应图标</td><td>108×108dp，安全区 72×72dp。<b>前景层放两字，背景层纯黄</b>，
+    避免被系统裁成圆形时切掉笔画</td></tr>
+  <tr><td>通知栏图标</td><td>安卓要求<b>纯 alpha 单色</b>：用单字「药」剪影，不带底色</td></tr>
+  <tr><td>桌面标签</td><td>「吃药了」（系统自动显示在图标下方）</td></tr>
+  <tr><td>不做的事</td><td><b>不做深色模式变体</b>（图标恒定最易记忆）、<b>不做角标数字</b>（小字对这个人群无效）、
+    <b>不做动效</b></td></tr>
+</table>
+
+<div class="box red">
+  <div class="lbl">第 11 天必须做的一个 15 秒测试</div>
+  <p>把这个图标装到老人手机上，<b>随手混在其他图标里，然后请他找出来</b>。
+  计时。<b>超过 5 秒就是失败。</b></p>
+  <p>再问一句：<b>「这个是干什么的？」</b>——如果他答不上来，
+  说明名字和图标至少有一个没做到位。这两句话的成本是零，价值超过任何设计评审。</p>
+</div>
+
+<footer>
+  配套文档：《方案总结》《Wireframe》《POC 方案》。<br>
+  视觉障碍模拟为 SVG 滤镜近似（色觉障碍用标准色觉转换矩阵；白内障为黄化 + 散射 + 低对比的工程近似），
+  <b>用于设计取舍参考，不能替代真人测试</b>。
+</footer>
+
+</div>
+</body>
+</html>

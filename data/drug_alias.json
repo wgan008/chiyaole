@@ -1,0 +1,1075 @@
+{
+  "_meta": {
+    "schema": "drug_alias/v1",
+    "purpose": "Map any Chinese drug name read off a pill box to a canonical generic code.",
+    "rules": [
+      "A code is an entity, not a molecule family.",
+      "★ resolve_drug() matches `drugs` ONLY. A combination product resolves to None — it is a different entity from any of its components and must go to the caregiver for review (spec §10.1).",
+      "Combination products live in `combinations` with their `components`. safety.check() expands them, so 缬沙坦 + 诺欣妥 is correctly caught as a duplicate generic.",
+      "No alias may appear under two codes. tests/test_data_integrity.py enforces this.",
+      "Never add an alias you have not seen on a real box or in a national formulary.",
+      "TODO: ~100 single codes today. Spec DoD requires >=300 entries covering all of evals/boxes. Grow this from the boxes you buy, not from a model."
+    ],
+    "updated": "2026-08"
+  },
+  "drugs": {
+    "AMLODIPINE": {
+      "generic_zh": "氨氯地平",
+      "class": "CCB",
+      "aliases": [
+        "苯磺酸氨氯地平",
+        "苯磺酸氨氯地平片",
+        "氨氯地平",
+        "络活喜",
+        "安内真",
+        "压氏达"
+      ]
+    },
+    "NIFEDIPINE": {
+      "generic_zh": "硝苯地平",
+      "class": "CCB",
+      "aliases": [
+        "硝苯地平",
+        "硝苯地平缓释片",
+        "硝苯地平控释片",
+        "拜新同",
+        "伲福达",
+        "心痛定"
+      ]
+    },
+    "FELODIPINE": {
+      "generic_zh": "非洛地平",
+      "class": "CCB",
+      "aliases": [
+        "非洛地平",
+        "非洛地平缓释片",
+        "波依定"
+      ]
+    },
+    "LEVAMLODIPINE": {
+      "generic_zh": "左氨氯地平",
+      "class": "CCB",
+      "aliases": [
+        "左旋氨氯地平",
+        "苯磺酸左旋氨氯地平",
+        "马来酸左旋氨氯地平",
+        "施慧达",
+        "左氨氯地平"
+      ]
+    },
+    "NITRENDIPINE": {
+      "generic_zh": "尼群地平",
+      "class": "CCB",
+      "aliases": [
+        "尼群地平"
+      ]
+    },
+    "LACIDIPINE": {
+      "generic_zh": "拉西地平",
+      "class": "CCB",
+      "aliases": [
+        "拉西地平",
+        "乐息平"
+      ]
+    },
+    "DILTIAZEM": {
+      "generic_zh": "地尔硫卓",
+      "class": "CCB",
+      "aliases": [
+        "地尔硫卓",
+        "盐酸地尔硫卓",
+        "合心爽"
+      ]
+    },
+    "ENALAPRIL": {
+      "generic_zh": "依那普利",
+      "class": "ACEI",
+      "aliases": [
+        "依那普利",
+        "马来酸依那普利",
+        "依苏"
+      ]
+    },
+    "BENAZEPRIL": {
+      "generic_zh": "贝那普利",
+      "class": "ACEI",
+      "aliases": [
+        "贝那普利",
+        "盐酸贝那普利",
+        "洛汀新"
+      ]
+    },
+    "CAPTOPRIL": {
+      "generic_zh": "卡托普利",
+      "class": "ACEI",
+      "aliases": [
+        "卡托普利",
+        "开博通"
+      ]
+    },
+    "PERINDOPRIL": {
+      "generic_zh": "培哚普利",
+      "class": "ACEI",
+      "aliases": [
+        "培哚普利",
+        "培哚普利叔丁胺",
+        "雅施达"
+      ]
+    },
+    "RAMIPRIL": {
+      "generic_zh": "雷米普利",
+      "class": "ACEI",
+      "aliases": [
+        "雷米普利",
+        "瑞泰"
+      ]
+    },
+    "IMIDAPRIL": {
+      "generic_zh": "咪达普利",
+      "class": "ACEI",
+      "aliases": [
+        "咪达普利",
+        "盐酸咪达普利",
+        "达爽"
+      ]
+    },
+    "LOSARTAN": {
+      "generic_zh": "氯沙坦",
+      "class": "ARB",
+      "aliases": [
+        "氯沙坦",
+        "氯沙坦钾",
+        "科素亚",
+        "洛沙坦"
+      ]
+    },
+    "VALSARTAN": {
+      "generic_zh": "缬沙坦",
+      "class": "ARB",
+      "aliases": [
+        "缬沙坦",
+        "代文",
+        "穗悦"
+      ]
+    },
+    "IRBESARTAN": {
+      "generic_zh": "厄贝沙坦",
+      "class": "ARB",
+      "aliases": [
+        "厄贝沙坦",
+        "安博维",
+        "伊达力"
+      ]
+    },
+    "TELMISARTAN": {
+      "generic_zh": "替米沙坦",
+      "class": "ARB",
+      "aliases": [
+        "替米沙坦",
+        "美卡素"
+      ]
+    },
+    "OLMESARTAN": {
+      "generic_zh": "奥美沙坦",
+      "class": "ARB",
+      "aliases": [
+        "奥美沙坦",
+        "奥美沙坦酯",
+        "傲坦"
+      ]
+    },
+    "CANDESARTAN": {
+      "generic_zh": "坎地沙坦",
+      "class": "ARB",
+      "aliases": [
+        "坎地沙坦",
+        "坎地沙坦酯",
+        "必洛斯"
+      ]
+    },
+    "ALLISARTAN": {
+      "generic_zh": "阿利沙坦",
+      "class": "ARB",
+      "aliases": [
+        "阿利沙坦",
+        "阿利沙坦酯",
+        "信立坦"
+      ]
+    },
+    "METOPROLOL": {
+      "generic_zh": "美托洛尔",
+      "class": "BB",
+      "aliases": [
+        "美托洛尔",
+        "酒石酸美托洛尔",
+        "琥珀酸美托洛尔",
+        "倍他乐克",
+        "美托洛尔缓释片"
+      ]
+    },
+    "BISOPROLOL": {
+      "generic_zh": "比索洛尔",
+      "class": "BB",
+      "aliases": [
+        "比索洛尔",
+        "富马酸比索洛尔",
+        "康忻",
+        "博苏"
+      ]
+    },
+    "CARVEDILOL": {
+      "generic_zh": "卡维地洛",
+      "class": "BB",
+      "aliases": [
+        "卡维地洛",
+        "金络"
+      ]
+    },
+    "ATENOLOL": {
+      "generic_zh": "阿替洛尔",
+      "class": "BB",
+      "aliases": [
+        "阿替洛尔"
+      ]
+    },
+    "HCTZ": {
+      "generic_zh": "氢氯噻嗪",
+      "class": "DIURETIC",
+      "aliases": [
+        "氢氯噻嗪",
+        "双氢克尿噻"
+      ]
+    },
+    "INDAPAMIDE": {
+      "generic_zh": "吲达帕胺",
+      "class": "DIURETIC",
+      "aliases": [
+        "吲达帕胺",
+        "钠催离",
+        "寿比山"
+      ]
+    },
+    "FUROSEMIDE": {
+      "generic_zh": "呋塞米",
+      "class": "DIURETIC",
+      "aliases": [
+        "呋塞米",
+        "速尿"
+      ]
+    },
+    "SPIRONOLACTONE": {
+      "generic_zh": "螺内酯",
+      "class": "DIURETIC",
+      "aliases": [
+        "螺内酯",
+        "安体舒通"
+      ]
+    },
+    "TORASEMIDE": {
+      "generic_zh": "托拉塞米",
+      "class": "DIURETIC",
+      "aliases": [
+        "托拉塞米",
+        "特苏尼"
+      ]
+    },
+    "RESERPINE": {
+      "generic_zh": "利血平",
+      "class": "ANTIHTN",
+      "aliases": [
+        "利血平"
+      ]
+    },
+    "TERAZOSIN": {
+      "generic_zh": "特拉唑嗪",
+      "class": "ALPHA",
+      "aliases": [
+        "特拉唑嗪",
+        "盐酸特拉唑嗪",
+        "高特灵"
+      ]
+    },
+    "DOXAZOSIN": {
+      "generic_zh": "多沙唑嗪",
+      "class": "ALPHA",
+      "aliases": [
+        "多沙唑嗪",
+        "可多华"
+      ]
+    },
+    "METFORMIN": {
+      "generic_zh": "二甲双胍",
+      "class": "BIGUANIDE",
+      "aliases": [
+        "二甲双胍",
+        "盐酸二甲双胍",
+        "盐酸二甲双胍片",
+        "格华止",
+        "二甲双胍缓释片",
+        "美迪康"
+      ]
+    },
+    "GLIMEPIRIDE": {
+      "generic_zh": "格列美脲",
+      "class": "SU",
+      "aliases": [
+        "格列美脲",
+        "亚莫利",
+        "万苏平"
+      ]
+    },
+    "GLICLAZIDE": {
+      "generic_zh": "格列齐特",
+      "class": "SU",
+      "aliases": [
+        "格列齐特",
+        "达美康",
+        "格列齐特缓释片"
+      ]
+    },
+    "GLIPIZIDE": {
+      "generic_zh": "格列吡嗪",
+      "class": "SU",
+      "aliases": [
+        "格列吡嗪",
+        "瑞易宁",
+        "美吡达"
+      ]
+    },
+    "GLIBENCLAMIDE": {
+      "generic_zh": "格列本脲",
+      "class": "SU",
+      "aliases": [
+        "格列本脲",
+        "优降糖"
+      ]
+    },
+    "GLIQUIDONE": {
+      "generic_zh": "格列喹酮",
+      "class": "SU",
+      "aliases": [
+        "格列喹酮",
+        "糖适平"
+      ]
+    },
+    "ACARBOSE": {
+      "generic_zh": "阿卡波糖",
+      "class": "AGI",
+      "aliases": [
+        "阿卡波糖",
+        "拜唐苹",
+        "卡博平"
+      ]
+    },
+    "VOGLIBOSE": {
+      "generic_zh": "伏格列波糖",
+      "class": "AGI",
+      "aliases": [
+        "伏格列波糖",
+        "倍欣"
+      ]
+    },
+    "SITAGLIPTIN": {
+      "generic_zh": "西格列汀",
+      "class": "DPP4",
+      "aliases": [
+        "西格列汀",
+        "磷酸西格列汀",
+        "捷诺维"
+      ]
+    },
+    "SAXAGLIPTIN": {
+      "generic_zh": "沙格列汀",
+      "class": "DPP4",
+      "aliases": [
+        "沙格列汀",
+        "安立泽"
+      ]
+    },
+    "LINAGLIPTIN": {
+      "generic_zh": "利格列汀",
+      "class": "DPP4",
+      "aliases": [
+        "利格列汀",
+        "欧唐宁"
+      ]
+    },
+    "DAPAGLIFLOZIN": {
+      "generic_zh": "达格列净",
+      "class": "SGLT2",
+      "aliases": [
+        "达格列净",
+        "安达唐"
+      ]
+    },
+    "EMPAGLIFLOZIN": {
+      "generic_zh": "恩格列净",
+      "class": "SGLT2",
+      "aliases": [
+        "恩格列净",
+        "欧唐静"
+      ]
+    },
+    "REPAGLINIDE": {
+      "generic_zh": "瑞格列奈",
+      "class": "GLINIDE",
+      "aliases": [
+        "瑞格列奈",
+        "诺和龙"
+      ]
+    },
+    "PIOGLITAZONE": {
+      "generic_zh": "吡格列酮",
+      "class": "TZD",
+      "aliases": [
+        "吡格列酮",
+        "盐酸吡格列酮",
+        "艾可拓"
+      ]
+    },
+    "ATORVASTATIN": {
+      "generic_zh": "阿托伐他汀",
+      "class": "STATIN",
+      "aliases": [
+        "阿托伐他汀",
+        "阿托伐他汀钙",
+        "立普妥",
+        "阿乐",
+        "尤佳"
+      ]
+    },
+    "ROSUVASTATIN": {
+      "generic_zh": "瑞舒伐他汀",
+      "class": "STATIN",
+      "aliases": [
+        "瑞舒伐他汀",
+        "瑞舒伐他汀钙",
+        "可定",
+        "托妥"
+      ]
+    },
+    "SIMVASTATIN": {
+      "generic_zh": "辛伐他汀",
+      "class": "STATIN",
+      "aliases": [
+        "辛伐他汀",
+        "舒降之",
+        "京必舒新"
+      ]
+    },
+    "PRAVASTATIN": {
+      "generic_zh": "普伐他汀",
+      "class": "STATIN",
+      "aliases": [
+        "普伐他汀",
+        "普拉固"
+      ]
+    },
+    "FLUVASTATIN": {
+      "generic_zh": "氟伐他汀",
+      "class": "STATIN",
+      "aliases": [
+        "氟伐他汀",
+        "来适可"
+      ]
+    },
+    "PITAVASTATIN": {
+      "generic_zh": "匹伐他汀",
+      "class": "STATIN",
+      "aliases": [
+        "匹伐他汀",
+        "力清之"
+      ]
+    },
+    "EZETIMIBE": {
+      "generic_zh": "依折麦布",
+      "class": "LIPID",
+      "aliases": [
+        "依折麦布",
+        "益适纯"
+      ]
+    },
+    "FENOFIBRATE": {
+      "generic_zh": "非诺贝特",
+      "class": "LIPID",
+      "aliases": [
+        "非诺贝特",
+        "力平之"
+      ]
+    },
+    "ASPIRIN": {
+      "generic_zh": "阿司匹林",
+      "class": "ANTIPLT",
+      "aliases": [
+        "阿司匹林",
+        "阿司匹林肠溶片",
+        "拜阿司匹灵",
+        "乙酰水杨酸"
+      ]
+    },
+    "CLOPIDOGREL": {
+      "generic_zh": "氯吡格雷",
+      "class": "ANTIPLT",
+      "aliases": [
+        "氯吡格雷",
+        "硫酸氢氯吡格雷",
+        "波立维",
+        "泰嘉"
+      ]
+    },
+    "TICAGRELOR": {
+      "generic_zh": "替格瑞洛",
+      "class": "ANTIPLT",
+      "aliases": [
+        "替格瑞洛",
+        "倍林达"
+      ]
+    },
+    "WARFARIN": {
+      "generic_zh": "华法林",
+      "class": "ANTICOAG",
+      "aliases": [
+        "华法林",
+        "华法林钠",
+        "芬地尔"
+      ]
+    },
+    "RIVAROXABAN": {
+      "generic_zh": "利伐沙班",
+      "class": "ANTICOAG",
+      "aliases": [
+        "利伐沙班",
+        "拜瑞妥"
+      ]
+    },
+    "DABIGATRAN": {
+      "generic_zh": "达比加群",
+      "class": "ANTICOAG",
+      "aliases": [
+        "达比加群",
+        "达比加群酯",
+        "泰毕全"
+      ]
+    },
+    "OMEPRAZOLE": {
+      "generic_zh": "奥美拉唑",
+      "class": "PPI",
+      "aliases": [
+        "奥美拉唑",
+        "奥克",
+        "洛赛克"
+      ]
+    },
+    "PANTOPRAZOLE": {
+      "generic_zh": "泮托拉唑",
+      "class": "PPI",
+      "aliases": [
+        "泮托拉唑",
+        "潘妥洛克"
+      ]
+    },
+    "RABEPRAZOLE": {
+      "generic_zh": "雷贝拉唑",
+      "class": "PPI",
+      "aliases": [
+        "雷贝拉唑",
+        "波利特"
+      ]
+    },
+    "ESOMEPRAZOLE": {
+      "generic_zh": "埃索美拉唑",
+      "class": "PPI",
+      "aliases": [
+        "埃索美拉唑",
+        "耐信"
+      ]
+    },
+    "FAMOTIDINE": {
+      "generic_zh": "法莫替丁",
+      "class": "H2RA",
+      "aliases": [
+        "法莫替丁"
+      ]
+    },
+    "LEVOTHYROXINE": {
+      "generic_zh": "左甲状腺素",
+      "class": "THYROID",
+      "aliases": [
+        "左甲状腺素",
+        "左甲状腺素钠",
+        "优甲乐",
+        "雷替斯"
+      ]
+    },
+    "METHIMAZOLE": {
+      "generic_zh": "甲巯咪唑",
+      "class": "THYROID",
+      "aliases": [
+        "甲巯咪唑",
+        "赛治",
+        "他巴唑"
+      ]
+    },
+    "ALLOPURINOL": {
+      "generic_zh": "别嘌醇",
+      "class": "GOUT",
+      "aliases": [
+        "别嘌醇",
+        "别嘌呤醇"
+      ]
+    },
+    "FEBUXOSTAT": {
+      "generic_zh": "非布司他",
+      "class": "GOUT",
+      "aliases": [
+        "非布司他",
+        "非布索坦",
+        "瑞扬"
+      ]
+    },
+    "BENZBROMARONE": {
+      "generic_zh": "苯溴马隆",
+      "class": "GOUT",
+      "aliases": [
+        "苯溴马隆",
+        "立加利仙"
+      ]
+    },
+    "COLCHICINE": {
+      "generic_zh": "秋水仙碱",
+      "class": "GOUT",
+      "aliases": [
+        "秋水仙碱"
+      ]
+    },
+    "CALCIUM_CARBONATE_D3": {
+      "generic_zh": "碳酸钙D3",
+      "class": "SUPPLEMENT",
+      "aliases": [
+        "碳酸钙D3",
+        "碳酸钙维D3",
+        "碳酸钙维生素D3",
+        "钙尔奇",
+        "钙尔奇D"
+      ]
+    },
+    "CALCITRIOL": {
+      "generic_zh": "骨化三醇",
+      "class": "SUPPLEMENT",
+      "aliases": [
+        "骨化三醇",
+        "罗盖全"
+      ]
+    },
+    "ALENDRONATE": {
+      "generic_zh": "阿仑膦酸钠",
+      "class": "BONE",
+      "aliases": [
+        "阿仑膦酸钠",
+        "福善美"
+      ]
+    },
+    "VITAMIN_D3": {
+      "generic_zh": "维生素D3",
+      "class": "SUPPLEMENT",
+      "aliases": [
+        "维生素D3",
+        "胆钙化醇"
+      ]
+    },
+    "VITAMIN_B12": {
+      "generic_zh": "维生素B12",
+      "class": "SUPPLEMENT",
+      "aliases": [
+        "维生素B12",
+        "甲钴胺",
+        "弥可保"
+      ]
+    },
+    "FOLIC_ACID": {
+      "generic_zh": "叶酸",
+      "class": "SUPPLEMENT",
+      "aliases": [
+        "叶酸",
+        "斯利安"
+      ]
+    },
+    "POTASSIUM_CHLORIDE": {
+      "generic_zh": "氯化钾",
+      "class": "SUPPLEMENT",
+      "aliases": [
+        "氯化钾",
+        "补达秀",
+        "氯化钾缓释片"
+      ]
+    },
+    "DONEPEZIL": {
+      "generic_zh": "多奈哌齐",
+      "class": "CNS",
+      "aliases": [
+        "多奈哌齐",
+        "盐酸多奈哌齐",
+        "安理申"
+      ]
+    },
+    "MEMANTINE": {
+      "generic_zh": "美金刚",
+      "class": "CNS",
+      "aliases": [
+        "美金刚",
+        "盐酸美金刚",
+        "易倍申"
+      ]
+    },
+    "DIAZEPAM": {
+      "generic_zh": "地西泮",
+      "class": "BZD",
+      "aliases": [
+        "地西泮",
+        "安定"
+      ]
+    },
+    "ESTAZOLAM": {
+      "generic_zh": "艾司唑仑",
+      "class": "BZD",
+      "aliases": [
+        "艾司唑仑",
+        "舒乐安定"
+      ]
+    },
+    "ALPRAZOLAM": {
+      "generic_zh": "阿普唑仑",
+      "class": "BZD",
+      "aliases": [
+        "阿普唑仑",
+        "佳静安定"
+      ]
+    },
+    "ZOPICLONE": {
+      "generic_zh": "佐匹克隆",
+      "class": "Z_DRUG",
+      "aliases": [
+        "佐匹克隆",
+        "右佐匹克隆",
+        "文飞"
+      ]
+    },
+    "AMITRIPTYLINE": {
+      "generic_zh": "阿米替林",
+      "class": "TCA",
+      "aliases": [
+        "阿米替林",
+        "盐酸阿米替林"
+      ]
+    },
+    "SERTRALINE": {
+      "generic_zh": "舍曲林",
+      "class": "SSRI",
+      "aliases": [
+        "舍曲林",
+        "盐酸舍曲林",
+        "左洛复"
+      ]
+    },
+    "CHLORPHENAMINE": {
+      "generic_zh": "氯苯那敏",
+      "class": "ANTIHIST",
+      "aliases": [
+        "氯苯那敏",
+        "马来酸氯苯那敏",
+        "扑尔敏"
+      ]
+    },
+    "DIPHENHYDRAMINE": {
+      "generic_zh": "苯海拉明",
+      "class": "ANTIHIST",
+      "aliases": [
+        "苯海拉明",
+        "盐酸苯海拉明"
+      ]
+    },
+    "INDOMETACIN": {
+      "generic_zh": "吲哚美辛",
+      "class": "NSAID",
+      "aliases": [
+        "吲哚美辛",
+        "消炎痛"
+      ]
+    },
+    "IBUPROFEN": {
+      "generic_zh": "布洛芬",
+      "class": "NSAID",
+      "aliases": [
+        "布洛芬",
+        "芬必得"
+      ]
+    },
+    "CELECOXIB": {
+      "generic_zh": "塞来昔布",
+      "class": "NSAID",
+      "aliases": [
+        "塞来昔布",
+        "西乐葆"
+      ]
+    },
+    "METOCLOPRAMIDE": {
+      "generic_zh": "甲氧氯普胺",
+      "class": "PROKINET",
+      "aliases": [
+        "甲氧氯普胺",
+        "胃复安"
+      ]
+    },
+    "DIGOXIN": {
+      "generic_zh": "地高辛",
+      "class": "CARDIAC",
+      "aliases": [
+        "地高辛"
+      ]
+    },
+    "AMOXICILLIN": {
+      "generic_zh": "阿莫西林",
+      "class": "ANTIBIOTIC",
+      "aliases": [
+        "阿莫西林",
+        "羟氨苄青霉素",
+        "阿莫仙"
+      ]
+    },
+    "CEFUROXIME": {
+      "generic_zh": "头孢呋辛",
+      "class": "ANTIBIOTIC",
+      "aliases": [
+        "头孢呋辛",
+        "头孢呋辛酯",
+        "西力欣"
+      ]
+    },
+    "LEVOFLOXACIN": {
+      "generic_zh": "左氧氟沙星",
+      "class": "ANTIBIOTIC",
+      "aliases": [
+        "左氧氟沙星",
+        "可乐必妥"
+      ]
+    },
+    "TAMSULOSIN": {
+      "generic_zh": "坦索罗辛",
+      "class": "BPH",
+      "aliases": [
+        "坦索罗辛",
+        "盐酸坦索罗辛",
+        "哈乐"
+      ]
+    },
+    "FINASTERIDE": {
+      "generic_zh": "非那雄胺",
+      "class": "BPH",
+      "aliases": [
+        "非那雄胺",
+        "保列治"
+      ]
+    },
+    "ISOSORBIDE_MONONITRATE": {
+      "generic_zh": "单硝酸异山梨酯",
+      "class": "NITRATE",
+      "aliases": [
+        "单硝酸异山梨酯",
+        "欣康",
+        "依姆多"
+      ]
+    },
+    "NITROGLYCERIN": {
+      "generic_zh": "硝酸甘油",
+      "class": "NITRATE",
+      "aliases": [
+        "硝酸甘油"
+      ]
+    },
+    "TRIMETAZIDINE": {
+      "generic_zh": "曲美他嗪",
+      "class": "CARDIAC",
+      "aliases": [
+        "曲美他嗪",
+        "盐酸曲美他嗪",
+        "万爽力"
+      ]
+    },
+    "BETAHISTINE": {
+      "generic_zh": "倍他司汀",
+      "class": "VERTIGO",
+      "aliases": [
+        "倍他司汀",
+        "敏使朗"
+      ]
+    },
+    "SACUBITRIL": {
+      "generic_zh": "沙库巴曲",
+      "class": "ARNI",
+      "aliases": [
+        "沙库巴曲"
+      ]
+    },
+    "LEVODOPA": {
+      "generic_zh": "左旋多巴",
+      "class": "CNS",
+      "aliases": [
+        "左旋多巴"
+      ]
+    },
+    "BENSERAZIDE": {
+      "generic_zh": "苄丝肼",
+      "class": "CNS",
+      "aliases": [
+        "苄丝肼"
+      ]
+    }
+  },
+  "combinations": {
+    "SACUBITRIL_VALSARTAN": {
+      "generic_zh": "沙库巴曲缬沙坦",
+      "class": "ARNI",
+      "aliases": [
+        "沙库巴曲缬沙坦",
+        "沙库巴曲缬沙坦钠",
+        "诺欣妥"
+      ],
+      "components": [
+        "SACUBITRIL",
+        "VALSARTAN"
+      ]
+    },
+    "AMLODIPINE_BENAZEPRIL": {
+      "generic_zh": "氨氯地平贝那普利",
+      "class": "COMBO",
+      "aliases": [
+        "氨氯地平贝那普利",
+        "百安新"
+      ],
+      "components": [
+        "AMLODIPINE",
+        "BENAZEPRIL"
+      ]
+    },
+    "VALSARTAN_HCTZ": {
+      "generic_zh": "缬沙坦氢氯噻嗪",
+      "class": "COMBO",
+      "aliases": [
+        "缬沙坦氢氯噻嗪",
+        "复代文"
+      ],
+      "components": [
+        "VALSARTAN",
+        "HCTZ"
+      ]
+    },
+    "IRBESARTAN_HCTZ": {
+      "generic_zh": "厄贝沙坦氢氯噻嗪",
+      "class": "COMBO",
+      "aliases": [
+        "厄贝沙坦氢氯噻嗪",
+        "安博诺"
+      ],
+      "components": [
+        "IRBESARTAN",
+        "HCTZ"
+      ]
+    },
+    "LOSARTAN_HCTZ": {
+      "generic_zh": "氯沙坦钾氢氯噻嗪",
+      "class": "COMBO",
+      "aliases": [
+        "氯沙坦钾氢氯噻嗪",
+        "海捷亚"
+      ],
+      "components": [
+        "LOSARTAN",
+        "HCTZ"
+      ]
+    },
+    "AMLODIPINE_VALSARTAN": {
+      "generic_zh": "氨氯地平缬沙坦",
+      "class": "COMBO",
+      "aliases": [
+        "氨氯地平缬沙坦",
+        "倍博特"
+      ],
+      "components": [
+        "AMLODIPINE",
+        "VALSARTAN"
+      ]
+    },
+    "COMPOUND_RESERPINE": {
+      "generic_zh": "复方利血平",
+      "class": "COMBO",
+      "aliases": [
+        "复方利血平",
+        "复方降压片",
+        "北京降压0号",
+        "复方利血平氨苯蝶啶"
+      ],
+      "components": [
+        "RESERPINE",
+        "HCTZ"
+      ]
+    },
+    "LEVODOPA_BENSERAZIDE": {
+      "generic_zh": "多巴丝肼",
+      "class": "COMBO",
+      "aliases": [
+        "多巴丝肼",
+        "美多芭"
+      ],
+      "components": [
+        "LEVODOPA",
+        "BENSERAZIDE"
+      ]
+    }
+  },
+  "dosage_form_suffixes": [
+    "肠溶缓释胶囊",
+    "肠溶缓释片",
+    "缓释胶囊",
+    "控释胶囊",
+    "分散片",
+    "咀嚼片",
+    "泡腾片",
+    "肠溶胶囊",
+    "肠溶片",
+    "缓释片",
+    "控释片",
+    "口服液",
+    "滴丸",
+    "颗粒",
+    "胶囊",
+    "干混悬剂",
+    "软胶囊",
+    "含片",
+    "糖衣片",
+    "薄膜衣片",
+    "片剂",
+    "散剂",
+    "丸剂",
+    "片",
+    "丸",
+    "剂"
+  ],
+  "salt_prefixes": [
+    "苯磺酸",
+    "马来酸",
+    "琥珀酸",
+    "酒石酸",
+    "富马酸",
+    "盐酸",
+    "硫酸氢",
+    "硫酸",
+    "磷酸",
+    "醋酸",
+    "枸橼酸",
+    "氢溴酸",
+    "甲磺酸",
+    "门冬氨酸",
+    "单硝酸",
+    "碳酸"
+  ]
+}

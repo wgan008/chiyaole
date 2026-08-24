@@ -1,0 +1,33 @@
+# Production overlay — adds automatic HTTPS via Caddy and restart policies for an
+# always-on VPS. Run alongside the base file, never instead of it:
+#
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+#
+# Requires CHIYAOLE_DOMAIN in .env — its DNS A record must already point at this host
+# before Caddy can request a Let's Encrypt certificate for it. HTTPS is not optional here:
+# the caregiver web page's <input capture> (camera) is disabled outright by browsers,
+# including WeChat's in-app browser, on a plain-HTTP page (spec §3.1).
+services:
+  postgres:
+    restart: unless-stopped
+
+  app:
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    env_file: .env
+    volumes:
+      - ./ops/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - app
+
+volumes:
+  caddy_data:
+  caddy_config:

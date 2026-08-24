@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}联系方式 - 吃药了{% endblock %}
+{% block content %}
+<h1>联系方式</h1>
+<p class="hint">这些名字会被设备原样念出来，比如"王阿姨该吃药了"、"我这就去问小芳"。
+  写老人平时怎么称呼，不用写身份证上的名字。</p>
+<div class="card">
+  <label>怎么称呼老人（设备念给她/他听）</label>
+  <input type="text" id="display_name" placeholder="例如：王阿姨">
+  <label>老人怎么称呼你</label>
+  <input type="text" id="called_by" placeholder="例如：小芳">
+  <label>你和老人的关系</label>
+  <select id="relation">
+    <option value="daughter">女儿</option>
+    <option value="son">儿子</option>
+    <option value="spouse">配偶</option>
+    <option value="other">其他</option>
+  </select>
+  <label>你的手机号（联系不上时，老人可以直接拨打）</label>
+  <input type="tel" id="phone" placeholder="手机号">
+  <button id="save">保存</button>
+  <div id="msg" class="msg"></div>
+</div>
+
+<h1 style="margin-top:32px">配对老人手机</h1>
+<p class="hint">在老人手机上装好 App 后，打开它会要求输入一个配对码。点下面的按钮生成一个，
+  念给装手机的人听——15 分钟内有效，用过一次或者重新生成一个新的，旧的就失效了。</p>
+<div class="card">
+  <button id="genCodeBtn">生成配对码</button>
+  <div id="codeBox" style="display:none;margin-top:12px;text-align:center">
+    <div id="codeDigits" style="font-size:40px;font-weight:700;letter-spacing:6px"></div>
+    <div id="codeExpiry" class="hint" style="margin-top:4px"></div>
+  </div>
+  <div id="codeMsg" class="msg"></div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+document.getElementById("save").addEventListener("click", async () => {
+  const msgEl = document.getElementById("msg");
+  const body = {
+    display_name: document.getElementById("display_name").value.trim(),
+    called_by: document.getElementById("called_by").value.trim(),
+    relation: document.getElementById("relation").value,
+    phone: document.getElementById("phone").value.trim(),
+  };
+  if (!body.display_name || !body.called_by || !body.phone) {
+    showMsg(msgEl, "都填一下吧", "error");
+    return;
+  }
+  try {
+    await apiPostJson("/api/setup/contact", body);
+    showMsg(msgEl, "已保存", "ok");
+  } catch (err) {
+    showMsg(msgEl, `失败：${err.message}`, "error");
+  }
+});
+
+document.getElementById("genCodeBtn").addEventListener("click", async () => {
+  const msgEl = document.getElementById("codeMsg");
+  try {
+    const data = await apiPostJson(`/api/patient/${window.CHIYAOLE.patientId}/pairing-code`, {});
+    document.getElementById("codeDigits").textContent = data.code;
+    const expires = new Date(data.expires_at);
+    document.getElementById("codeExpiry").textContent =
+      `${expires.getHours().toString().padStart(2, "0")}:${expires.getMinutes().toString().padStart(2, "0")} 前有效`;
+    document.getElementById("codeBox").style.display = "block";
+    showMsg(msgEl, "", "");
+  } catch (err) {
+    showMsg(msgEl, `生成失败：${err.message}`, "error");
+  }
+});
+</script>
+{% endblock %}

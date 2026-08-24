@@ -1,0 +1,36 @@
+{
+  "_meta": {
+    "schema": "interactions/v1",
+    "status": "UNVERIFIED — a deliberately tiny, high-confidence list. Verify each pair against a national formulary before use with a real patient.",
+    "scope": [
+      "This list exists to raise a question for the ADULT CHILD to put to the doctor.",
+      "★ It never produces advice, never reaches the elder, and never suggests a change.",
+      "Small and certain beats large and noisy: an alert the caregiver learns to dismiss is worse than no alert."
+    ],
+    "TODO": "Grow only from pairs actually seen in collected regimens, each with a citation.",
+    "updated": "2026-08"
+  },
+  "pairs": [
+    {"codes": ["WARFARIN", "ASPIRIN"],        "level": "high", "concern": "抗凝 + 抗血小板：出血风险叠加", "ask_doctor": "这两个药一起吃，出血风险的问题值得问一次医生"},
+    {"codes": ["WARFARIN", "IBUPROFEN"],      "level": "high", "concern": "抗凝 + NSAID：消化道出血风险显著升高", "ask_doctor": "同上"},
+    {"codes": ["WARFARIN", "INDOMETACIN"],    "level": "high", "concern": "抗凝 + NSAID：消化道出血风险显著升高", "ask_doctor": "同上"},
+    {"codes": ["CLOPIDOGREL", "OMEPRAZOLE"],  "level": "low",  "concern": "奥美拉唑可能降低氯吡格雷活化", "ask_doctor": "问问是否需要换一种护胃药"},
+    {"codes": ["SPIRONOLACTONE", "ENALAPRIL"],  "level": "high", "concern": "保钾利尿剂 + ACEI：高钾血症风险", "ask_doctor": "问问多久查一次血钾"},
+    {"codes": ["SPIRONOLACTONE", "BENAZEPRIL"], "level": "high", "concern": "保钾利尿剂 + ACEI：高钾血症风险", "ask_doctor": "同上"},
+    {"codes": ["SPIRONOLACTONE", "VALSARTAN"],  "level": "high", "concern": "保钾利尿剂 + ARB：高钾血症风险", "ask_doctor": "同上"},
+    {"codes": ["SPIRONOLACTONE", "LOSARTAN"],   "level": "high", "concern": "保钾利尿剂 + ARB：高钾血症风险", "ask_doctor": "同上"},
+    {"codes": ["SPIRONOLACTONE", "POTASSIUM_CHLORIDE"], "level": "high", "concern": "保钾利尿剂 + 补钾：高钾血症风险", "ask_doctor": "同上"},
+    {"codes": ["SIMVASTATIN", "FENOFIBRATE"], "level": "high", "concern": "他汀 + 贝特类：肌病与横纹肌溶解风险", "ask_doctor": "如果出现肌肉酸痛要及时说，问问医生怎么监测"},
+    {"codes": ["ATORVASTATIN", "FENOFIBRATE"],"level": "high", "concern": "他汀 + 贝特类：肌病与横纹肌溶解风险", "ask_doctor": "同上"},
+    {"codes": ["DIGOXIN", "FUROSEMIDE"],      "level": "low",  "concern": "排钾利尿导致低钾，增加地高辛中毒风险", "ask_doctor": "问问是否需要定期查血钾和地高辛浓度"},
+    {"codes": ["DIGOXIN", "AMIODARONE"],      "level": "high", "concern": "胺碘酮升高地高辛血药浓度", "ask_doctor": "问问地高辛剂量是否需要复核"},
+    {"codes": ["DIAZEPAM", "ESTAZOLAM"],      "level": "high", "concern": "两种苯二氮䓬类叠加：跌倒与呼吸抑制风险", "ask_doctor": "两个安眠药一起吃，值得问医生是否需要"},
+    {"codes": ["METFORMIN", "GLIBENCLAMIDE"], "level": "low",  "concern": "联合降糖：低血糖风险，老年人尤需注意", "ask_doctor": "问问低血糖发作时该怎么办"}
+  ],
+  "class_rules": [
+    {"classes": ["ACEI", "ARB"],   "level": "high", "concern": "ACEI 与 ARB 联用：肾功能恶化与高钾风险，指南一般不推荐", "ask_doctor": "两个降压药作用机制相近，问问是否都需要"},
+    {"classes": ["NSAID", "NSAID"],"level": "high", "concern": "两种 NSAID 联用：消化道出血风险叠加，无额外获益", "ask_doctor": "两个止痛药一起吃，问问是否可以只留一个"},
+    {"classes": ["BZD", "BZD"],    "level": "high", "concern": "两种苯二氮䓬类联用：跌倒与呼吸抑制风险", "ask_doctor": "两个安眠药一起吃，值得问医生"},
+    {"classes": ["SU", "SU"],      "level": "high", "concern": "两种磺脲类联用：严重低血糖风险", "ask_doctor": "问问是否需要两个"}
+  ]
+}

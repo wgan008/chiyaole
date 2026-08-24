@@ -1,0 +1,328 @@
+{% extends "base.html" %}
+{% block title %}确认用药 - 吃药了{% endblock %}
+{% block content %}
+<h1>确认用药</h1>
+<div id="wizard"></div>
+<div id="alreadyDone"></div>
+{% endblock %}
+{% block scripts %}
+<script>
+// ★ Matches docs/design/02_Wireframe.html D2: one box reviewed at a time (a step-through
+// wizard with a progress bar), not a long scrolling list. Field-by-field checkboxes,
+// pre-checked EXCEPT 规格 (strength/dosage) — that one starts unchecked on purpose and the
+// confirm button stays disabled until every checkbox on the current box is checked
+// ("全部确认后才能生效" — the caregiver's own safety-alert screen is the red line here,
+// see agent/safety.py: a wrong 5mg-read-as-50mg VLM output looks exactly as confident and
+// tidy as a correct one, so nothing here may become active without a human actually
+// looking at the original photo).
+let draft = null;
+let stepIndex = 0;
+let stepTimes = [];
+// ★ The caregiver sets the actual alarm times here — this is what /api/regimen/confirm
+// schedules, not a guess derived from usage_raw text. Prefilled from derived_times (a
+// suggestion computed from the text + a default routine) when available, but always
+// editable and always required: a box whose usage text can't be parsed ("详见说明书" with
+// no explicit frequency) must not silently get zero reminders.
+
+const wizardEl = document.getElementById("wizard");
+const alreadyDoneEl = document.getElementById("alreadyDone");
+
+async function load() {
+  draft = await apiGet("/api/regimen/draft");
+  stepIndex = 0;
+  render();
+}
+
+function draftItems() {
+  return draft.items.filter(i => i.status === "draft");
+}
+
+function render() {
+  const items = draftItems();
+  if (!items.length) {
+    wizardEl.innerHTML = `<p class="hint">没有待确认的药了。</p>`;
+    renderAlreadyDone();
+    return;
+  }
+  if (stepIndex >= items.length) stepIndex = items.length - 1;
+  renderStep(items[stepIndex], stepIndex, items.length);
+  renderAlreadyDone();
+}
+
+function renderStep(item, idx, total) {
+  const alertsHtml = draft.alerts.map(a => `
+    <div class="alert">
+      <strong>⚠ ${a.message}</strong>
+      <div class="hint" style="margin:4px 0 0">${a.ask_doctor}</div>
+    </div>`).join("");
+
+  wizardEl.innerHTML = `
+    <div class="wizard-bar">核对老人的药 · 第 ${idx + 1} 步 / 共 ${total} 步</div>
+    <div class="wizard-body">
+      <div style="display:flex; gap:16px; flex-wrap:wrap">
+        <div style="flex:0 0 140px">
+          ${item.photo_url
+            ? `<a href="${item.photo_url}" target="_blank"><div class="imgbox" style="height:130px"><img src="${item.photo_url}" alt="药盒照片"></div></a>
+               <div class="hint" style="text-align:center;margin-top:5px">点击放大 · 原图永久保留</div>`
+            : `<div class="imgbox" style="height:130px">（没有照片）</div>`}
+        </div>
+        <div style="flex:1; min-width:250px">
+          <table class="field-table">
+            <tr><th style="width:70px">字段</th><th>AI 读出的</th><th style="width:44px">确认</th></tr>
+            <tr>
+              <td>通用名</td>
+              <td><input type="text" class="f-generic_name" value="${item.generic_name || ""}"></td>
+              <td style="text-align:center"><input type="checkbox" class="f-check" data-field="generic_name" checked></td>
+            </tr>
+            <tr>
+              <td>商品名</td>
+              <td><input type="text" class="f-brand_name" value="${item.brand_name || ""}"></td>
+              <td style="text-align:center"><input type="checkbox" class="f-check" data-field="brand_name" checked></td>
+            </tr>
+            <tr class="${item.strength_value == null ? "" : "bad"}">
+              <td><b>规格</b></td>
+              <td>
+                <input type="text" class="f-strength_value" style="width:70px;display:inline-block" value="${item.strength_value ?? ""}">
+                <input type="text" class="f-strength_unit" style="width:70px;display:inline-block" value="${item.strength_unit || ""}">
+                <span class="warn-note">⚠ 请对照原图核对</span>
+              </td>
+              <td style="text-align:center"><input type="checkbox" class="f-check" data-field="strength"></td>
+            </tr>
+            <tr>
+              <td>用法</td>
+              <td><input type="text" class="f-usage_raw" value="${item.usage_raw || ""}"></td>
+              <td style="text-align:center"><input type="checkbox" class="f-check" data-field="usage_raw" checked></td>
+            </tr>
+          </table>
+          <div style="margin-top:14px">
+            <div style="font-weight:700; font-size:13px; margin-bottom:6px">吃药时间</div>
+            <div id="timesList"></div>
+            <button id="addTimeBtn" class="btn-ghost" type="button" style="margin-top:2px;padding:6px 14px;font-size:13px">+ 加一次</button>
+            <div class="hint" style="margin-top:4px">
+              ${item.explicit_times && item.explicit_times.length
+                ? "已经设置过的时间，可以改。"
+                : item.derived_times && item.derived_times.length
+                  ? "已经按用法自动填好，确认前可以改。"
+                  : "用法里没写清楚吃几次/什么时候吃，请自己填时间。"}
+            </div>
+          </div>
+          <div style="margin-top:12px; display:flex; gap:8px; align-items:center">
+            <button id="confirmStepBtn" disabled>全部确认后才能生效</button>
+            <button id="deleteStepBtn" class="btn-ghost" type="button">这盒不要了</button>
+          </div>
+          <div class="msg" id="stepMsg"></div>
+        </div>
+      </div>
+      ${alertsHtml}
+    </div>`;
+
+  stepTimes = item.explicit_times && item.explicit_times.length
+    ? [...item.explicit_times]
+    : item.derived_times && item.derived_times.length
+      ? [...item.derived_times]
+      : [""];
+
+  const checks = wizardEl.querySelectorAll(".f-check");
+  const confirmBtn = document.getElementById("confirmStepBtn");
+  const updateConfirmEnabled = () => {
+    const allChecked = Array.from(checks).every(c => c.checked);
+    const hasTime = stepTimes.some(t => /^\d{2}:\d{2}$/.test(t));
+    const ok = allChecked && hasTime;
+    confirmBtn.disabled = !ok;
+    confirmBtn.textContent = ok ? "确认这一条" : (!hasTime ? "请先填吃药时间" : "全部确认后才能生效");
+  };
+  checks.forEach(c => c.addEventListener("change", updateConfirmEnabled));
+
+  function renderTimesList() {
+    const listEl = document.getElementById("timesList");
+    listEl.innerHTML = stepTimes.map((t, i) => `
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px">
+        <input type="time" class="time-input" data-idx="${i}" value="${t}" style="width:130px; padding:5px 7px; font-size:13px; border:1.5px solid var(--line2); border-radius:5px">
+        <button type="button" class="btn-ghost remove-time-btn" data-idx="${i}" style="padding:5px 10px;font-size:12px">删除</button>
+      </div>`).join("");
+    listEl.querySelectorAll(".time-input").forEach(inp => {
+      inp.addEventListener("input", () => {
+        stepTimes[Number(inp.dataset.idx)] = inp.value;
+        updateConfirmEnabled();
+      });
+    });
+    listEl.querySelectorAll(".remove-time-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        stepTimes.splice(Number(btn.dataset.idx), 1);
+        renderTimesList();
+        updateConfirmEnabled();
+      });
+    });
+  }
+  renderTimesList();
+  document.getElementById("addTimeBtn").addEventListener("click", () => {
+    stepTimes.push("");
+    renderTimesList();
+    updateConfirmEnabled();
+  });
+
+  updateConfirmEnabled();
+
+  confirmBtn.addEventListener("click", () => confirmStep(item));
+  document.getElementById("deleteStepBtn").addEventListener("click", () => deleteStep(item));
+}
+
+async function confirmStep(item) {
+  const msgEl = document.getElementById("stepMsg");
+  const fields = {
+    generic_name: wizardEl.querySelector(".f-generic_name").value,
+    brand_name: wizardEl.querySelector(".f-brand_name").value,
+    usage_raw: wizardEl.querySelector(".f-usage_raw").value,
+    strength_value: parseFloat(wizardEl.querySelector(".f-strength_value").value) || null,
+    strength_unit: wizardEl.querySelector(".f-strength_unit").value || null,
+  };
+  const times = stepTimes.filter(t => /^\d{2}:\d{2}$/.test(t));
+  try {
+    const result = await apiPostJson("/api/regimen/confirm", {
+      medication_id: item.medication_id,
+      fields,
+      confirmed: true,
+      times,
+    });
+    if (result.status === "blocked") {
+      showMsg(msgEl, "有安全提醒，暂不能生效，见上方提示。", "error");
+      return;
+    }
+    if (result.schedule === "ambiguous") {
+      // ★ Should not happen now that times[] is always sent from this wizard — kept as a
+      // safety net so a future caller that skips the time picker never fails silently
+      // (agent/schedule.py never guesses a frequency it can't read from the text).
+      alert(`已确认，但没能定上闹钟，请到"已经处理过的"里点"改时间"手动设置一下。`);
+    }
+    draft = await apiGet("/api/regimen/draft");
+    // stepIndex stays put: the confirmed item drops out of draftItems(), so the NEXT
+    // unconfirmed item slides into this same position automatically.
+    render();
+  } catch (err) {
+    showMsg(msgEl, `失败：${err.message}`, "error");
+  }
+}
+
+async function deleteStep(item) {
+  if (!confirm("确定不要这盒了吗？")) return;
+  try {
+    draft = await apiDelete(`/api/medication/${item.medication_id}`);
+    render();
+  } catch (err) {
+    document.getElementById("stepMsg").textContent = `删除失败：${err.message}`;
+  }
+}
+
+let editingMedId = null;
+let editingTimes = [];
+
+function renderAlreadyDone() {
+  const others = draft.items.filter(i => i.status !== "draft");
+  if (!others.length) {
+    alreadyDoneEl.innerHTML = "";
+    return;
+  }
+  alreadyDoneEl.innerHTML = `
+    <h2 style="font-size:15px;margin:24px 0 8px">已经处理过的</h2>
+    ${others.map(item => `
+      <div class="card" data-medication-id="${item.medication_id}">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <strong>${item.generic_name}</strong>
+            <span class="flag ${item.status === "active" ? "f-go" : "f-stop"}" style="margin-left:6px">
+              ${item.status === "active" ? "生效中" : "已停用"}</span>
+            ${item.status === "active"
+              ? `<div class="hint" style="margin:4px 0 0">${item.explicit_times && item.explicit_times.length ? "吃药时间：" + item.explicit_times.join("、") : "还没设置吃药时间"}</div>`
+              : ""}
+          </div>
+          ${item.status === "active"
+            ? `<div style="display:flex;gap:6px;flex-shrink:0">
+                 <button class="btn-ghost edit-time-btn" type="button">改时间</button>
+                 <button class="btn-ghost stop-btn" type="button">停用</button>
+               </div>`
+            : ""}
+        </div>
+        ${editingMedId === item.medication_id ? `<div class="edit-time-panel" style="margin-top:12px; padding-top:12px; border-top:1px solid var(--border)"></div>` : ""}
+      </div>`).join("")}`;
+
+  if (editingMedId) {
+    const panel = alreadyDoneEl.querySelector(`[data-medication-id="${editingMedId}"] .edit-time-panel`);
+    if (panel) renderEditTimePanel(panel);
+  }
+
+  alreadyDoneEl.querySelectorAll(".stop-btn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const medId = btn.closest(".card").dataset.medicationId;
+      if (!confirm("确定停用这个药吗？之前的记录会保留，只是不再生成新的提醒。")) return;
+      draft = await apiPostJson(`/api/medication/${medId}/stop`, {});
+      render();
+    });
+  });
+  alreadyDoneEl.querySelectorAll(".edit-time-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const medId = btn.closest(".card").dataset.medicationId;
+      const item = draft.items.find(i => i.medication_id === medId);
+      if (editingMedId === medId) {
+        editingMedId = null;
+      } else {
+        editingMedId = medId;
+        editingTimes = item.explicit_times && item.explicit_times.length ? [...item.explicit_times] : [""];
+      }
+      renderAlreadyDone();
+    });
+  });
+}
+
+function renderEditTimePanel(panel) {
+  panel.innerHTML = `
+    <div id="editTimesList"></div>
+    <button id="addEditTimeBtn" class="btn-ghost" type="button" style="margin-top:2px;padding:6px 14px;font-size:13px">+ 加一次</button>
+    <div style="margin-top:10px">
+      <button id="saveTimesBtn" type="button">保存</button>
+    </div>
+    <div class="msg" id="editTimeMsg"></div>`;
+
+  function renderList() {
+    const listEl = panel.querySelector("#editTimesList");
+    listEl.innerHTML = editingTimes.map((t, i) => `
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px">
+        <input type="time" class="edit-time-input" data-idx="${i}" value="${t}" style="width:130px; padding:5px 7px; font-size:13px; border:1.5px solid var(--line2); border-radius:5px">
+        <button type="button" class="btn-ghost remove-edit-time-btn" data-idx="${i}" style="padding:5px 10px;font-size:12px">删除</button>
+      </div>`).join("");
+    listEl.querySelectorAll(".edit-time-input").forEach(inp => {
+      inp.addEventListener("input", () => { editingTimes[Number(inp.dataset.idx)] = inp.value; });
+    });
+    listEl.querySelectorAll(".remove-edit-time-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        editingTimes.splice(Number(btn.dataset.idx), 1);
+        renderList();
+      });
+    });
+  }
+  renderList();
+
+  panel.querySelector("#addEditTimeBtn").addEventListener("click", () => {
+    editingTimes.push("");
+    renderList();
+  });
+
+  panel.querySelector("#saveTimesBtn").addEventListener("click", async () => {
+    const msgEl = panel.querySelector("#editTimeMsg");
+    const times = editingTimes.filter(t => /^\d{2}:\d{2}$/.test(t));
+    if (!times.length) {
+      showMsg(msgEl, "至少填一个时间", "error");
+      return;
+    }
+    try {
+      draft = await apiPostJson(`/api/medication/${editingMedId}/schedule`, { times });
+      editingMedId = null;
+      render();
+    } catch (err) {
+      showMsg(msgEl, `保存失败：${err.message}`, "error");
+    }
+  });
+}
+
+load();
+</script>
+{% endblock %}

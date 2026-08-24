@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Alarms. Layer 1 of keep-alive defence (spec §4.1).
+         USE_EXACT_ALARM is a normal permission, granted on install, from API 33.
+         SCHEDULE_EXACT_ALARM is the fallback for API 31-32 (pre-granted there) and is
+         requested at runtime on API 33+ if canScheduleExactAlarms() is false. -->
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- ★ Not in the base spec's permission list (§2.1), added because it is required for
+         the FullScreenIntent → AlarmActivity flow (spec §1 architecture) to launch
+         automatically, without a tap, on Android 14+. A normal permission pre-33; on 34+
+         it can be revoked by the user, checked via NotificationManager.canUseFullScreenIntent()
+         and walked in PermissionSetupActivity like the other steps. -->
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <uses-permission android:name="android.permission.SET_WALLPAPER" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- ★ Deliberately NOT requesting READ_PHONE_STATE. "Due during a call → defer until it
+         ends" (spec §4.4) is detected via AudioManager.mode (MODE_IN_CALL /
+         MODE_IN_COMMUNICATION), which needs no permission — see util/CallStateGuard.kt.
+         Fewer permission dialogs is a product requirement (spec §2.1), not just privacy. -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!-- Hold-to-speak (wireframe C1) — requested at runtime the first time the elder taps
+         the mic button, not up front (spec §2.1: fewer permission dialogs). -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- ❌ Never request: contacts, location, photo library, call log, SMS -->
+
+    <application
+        android:name=".ChiYaoLeApp"
+        android:allowBackup="false"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher"
+        android:supportsRtl="false"
+        android:theme="@style/Theme.ChiYaoLe"
+        android:usesCleartextTraffic="false"
+        tools:targetApi="35">
+
+        <activity
+            android:name=".ui.HomeActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.ChiYaoLe.Starting">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Shown via full-screen intent from the alarm notification. Must never make a
+             network call in onCreate — everything it needs is already cached locally
+             (spec §3.4-③, §7 ScheduleItem.photo_url pre-cached at enrolment). -->
+        <activity
+            android:name=".ui.AlarmActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:launchMode="singleInstance"
+            android:screenOrientation="portrait"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true" />
+
+        <activity
+            android:name=".ui.PairingActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".ui.PermissionSetupActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".ui.DoctorViewActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".ui.QaActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <receiver
+            android:name=".alarm.AlarmReceiver"
+            android:exported="false" />
+
+        <receiver
+            android:name=".alarm.BootReceiver"
+            android:exported="true"
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <!-- MIUI/HyperOS and other OEM ROMs sometimes send this instead of/around
+                     a full reboot after an update; we treat it the same as boot. -->
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name=".alarm.KeepAliveService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Time-critical medication reminders for an elderly user; the persistent notification doubles as the pending-dose card." />
+        </service>
+
+    </application>
+
+</manifest>

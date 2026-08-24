@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Compose owns almost all UI (see ui/theme/Theme.kt); this is only the pre-Compose
+         window background so first frame / launch doesn't flash white or system default. -->
+    <style name="Theme.ChiYaoLe" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:colorBackground">@color/white</item>
+        <item name="android:statusBarColor">@color/true_black</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+    <!-- Launch-time-only theme (HomeActivity, the launcher activity). Without this, the
+         platform/compat splash screen falls back to a plain white background — the adaptive
+         icon's yellow layer isn't part of the icon bitmap it draws, only the foreground glyph
+         is. Match the launcher icon's own background (#FFD500) here so the first frame isn't
+         a jarring flash of white before Compose paints. -->
+    <style name="Theme.ChiYaoLe.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/brand_yellow</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <item name="postSplashScreenTheme">@style/Theme.ChiYaoLe</item>
+    </style>
+</resources>

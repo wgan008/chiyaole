@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}开始 - 吃药了{% endblock %}
+{% block content %}
+<h1>给老人建一份用药表</h1>
+<p class="hint">大概 5 分钟。以后要再帮另一位老人建表，不用重新填这些——
+  进去以后点"我的老人"就能加。</p>
+<div class="card">
+  <label>怎么称呼老人（设备念给她/他听）</label>
+  <input type="text" id="display_name" placeholder="例如：王阿姨">
+  <label>老人怎么称呼你</label>
+  <input type="text" id="called_by" placeholder="例如：小芳">
+  <label>你和老人的关系</label>
+  <select id="relation">
+    <option value="daughter">女儿</option>
+    <option value="son">儿子</option>
+    <option value="spouse">配偶</option>
+    <option value="other">其他</option>
+  </select>
+  <label>你的手机号（联系不上时，老人可以直接拨打）</label>
+  <input type="tel" id="phone" placeholder="手机号">
+  <button id="start">开始</button>
+  <div id="msg" class="msg"></div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+// ★ No token yet on this page — this is the one unauthenticated write in the whole API
+// (see app/api/caregiver.py's account_start docstring). Every later "add another elder"
+// action goes through /api/account/patients instead, authenticated by the link this call
+// hands back.
+document.getElementById("start").addEventListener("click", async () => {
+  const msgEl = document.getElementById("msg");
+  const body = {
+    display_name: document.getElementById("display_name").value.trim(),
+    called_by: document.getElementById("called_by").value.trim(),
+    relation: document.getElementById("relation").value,
+    phone: document.getElementById("phone").value.trim(),
+  };
+  if (!body.display_name || !body.called_by || !body.phone) {
+    showMsg(msgEl, "都填一下吧", "error");
+    return;
+  }
+  try {
+    const resp = await fetch("/api/account/start", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    if (!resp.ok) throw new Error((await resp.json()).detail || `${resp.status}`);
+    const data = await resp.json();
+    window.location.href = `/web/${data.patient_id}/upload?t=${data.access_token}`;
+  } catch (err) {
+    showMsg(msgEl, `失败：${err.message}`, "error");
+  }
+});
+</script>
+{% endblock %}

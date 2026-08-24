@@ -1,0 +1,7 @@
+{
+  "_comment": "Synthetic fixture (not a real pill box photo) generated for server/tests_e2e/test_golden_path.py. The E2E test stubs agent.vision.ocr to return exactly these fields rather than diffing against a real OCR call, so this file documents the fixture's ground truth rather than driving an automated comparison — a real golden-eval harness (spec §8.3) is future work, tracked as a gap in the project's e2e/testing notes.",
+  "generic_name": "阿莫西林胶囊",
+  "strength_value": 0.25,
+  "strength_unit": "g",
+  "usage_raw": "每天三次，每次两粒，饭后服用"
+}

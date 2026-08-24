@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}我的老人 - 吃药了{% endblock %}
+{% block content %}
+<h1>我的老人</h1>
+<p class="hint">同一个手机号建的老人档案都会显示在这里，点一个就能切换过去。</p>
+<div id="eldersList"></div>
+
+<div class="card entry-choice-card" id="addElderCard" style="display:flex;gap:10px;align-items:center;cursor:pointer">
+  <div class="imgbox" style="width:40px;height:40px;flex:0 0 40px;font-size:20px">＋</div>
+  <div><div style="font-size:14px;font-weight:700">添加一位老人</div>
+    <div class="hint" style="margin:0">爸爸、婆婆……用同一个手机号，不用重新填联系方式</div></div>
+</div>
+
+<div class="card" id="addElderForm" style="display:none">
+  <label>怎么称呼这位老人（设备念给她/他听）</label>
+  <input type="text" id="newDisplayName" placeholder="例如：李叔叔">
+  <button id="addElderBtn">添加</button>
+  <div id="addElderMsg" class="msg"></div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+async function load() {
+  const data = await apiGet("/api/account/patients");
+  renderElders(data.patients);
+}
+
+let lastPatients = [];
+
+function renderElders(patients) {
+  lastPatients = patients;
+  const el = document.getElementById("eldersList");
+  el.innerHTML = patients.map(p => `
+    <div class="card" style="display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <strong>${p.display_name}</strong>
+        ${p.is_current ? `<span class="flag f-go" style="margin-left:6px">当前</span>` : ""}
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        ${p.is_current ? "" : `<a class="btn" style="text-decoration:none"
+            href="/web/${p.patient_id}/dashboard?t=${p.access_token}">切换过去 ›</a>`}
+        ${patients.length > 1 ? `<button class="btn-ghost delete-elder-btn"
+            type="button" data-patient-id="${p.patient_id}"
+            data-display-name="${p.display_name}">删除</button>` : ""}
+      </div>
+    </div>`).join("");
+
+  el.querySelectorAll(".delete-elder-btn").forEach(btn => {
+    btn.addEventListener("click", () => deleteElder(btn.dataset.patientId, btn.dataset.displayName));
+  });
+}
+
+async function deleteElder(patientId, displayName) {
+  if (!confirm(`确定要删除「${displayName}」吗？ta 的用药、化验单记录都会一起删掉，无法恢复。`)) return;
+  try {
+    const data = await apiDelete(`/api/account/patients/${patientId}`);
+    if (patientId === window.CHIYAOLE.patientId) {
+      // ★ Deleted the elder this page session itself is authenticated as — its token is
+      // now dead, so hop to another remaining elder's own dashboard rather than re-render
+      // in place (delete_patient guarantees at least one elder remains).
+      const next = data.patients[0];
+      window.location.href = `/web/${next.patient_id}/dashboard?t=${next.access_token}`;
+      return;
+    }
+    renderElders(data.patients);
+  } catch (err) {
+    alert(`删除失败：${err.message}`);
+  }
+}
+
+document.getElementById("addElderCard").addEventListener("click", () => {
+  document.getElementById("addElderForm").style.display = "block";
+  document.getElementById("addElderCard").style.display = "none";
+});
+
+document.getElementById("addElderBtn").addEventListener("click", async () => {
+  const msgEl = document.getElementById("addElderMsg");
+  const display_name = document.getElementById("newDisplayName").value.trim();
+  if (!display_name) {
+    showMsg(msgEl, "先填一下怎么称呼", "error");
+    return;
+  }
+  try {
+    const data = await apiPostJson("/api/account/patients", { display_name });
+    window.location.href = `/web/${data.patient_id}/upload?t=${data.access_token}`;
+  } catch (err) {
+    showMsg(msgEl, `添加失败：${err.message}`, "error");
+  }
+});
+
+load();
+</script>
+{% endblock %}

@@ -1,0 +1,154 @@
+{
+  "_meta": {
+    "schema": "pim_cn/v1",
+    "source": "中国老年人潜在不适当用药判断标准 (2017年版) — 中国药学会老年药学专业委员会",
+    "citation": "中国老年人潜在不适当用药目录. 药物不良反应杂志, 2018, 20(1): 2-8.",
+    "status": "UNVERIFIED — every entry below must be checked line by line against the published table before this file is used with a real patient. See TODO.",
+    "how_this_is_used": [
+      "A PIM hit NEVER produces advice and NEVER reaches the elder.",
+      "It sets a flag that BLOCKS schedule generation and routes the item to the adult child for manual confirmation (spec §7.3).",
+      "The wording shown to the adult child is a neutral prompt to ask the doctor — never a recommendation to change anything."
+    ],
+    "TODO": [
+      "Verify all entries against the source publication; drop any that cannot be cited.",
+      "Add the 条件 (conditional) list — drugs inappropriate only with a specific comorbidity.",
+      "Record the 风险强度 (low/high) grading from the source rather than the simplified level here."
+    ],
+    "updated": "2026-08",
+    "matching": "Entries match on `code` against normalize.resolve_drug output, or against a combination code / any of its components when `namespace` is 'combinations'. `conditional_on_form` narrows the match to a dosage form."
+  },
+  "entries": [
+    {
+      "code": "DIAZEPAM",
+      "name_zh": "地西泮",
+      "level": "high",
+      "concern": "长效苯二氮䓬类：跌倒、骨折、认知损害风险升高",
+      "ask_doctor": "这个安眠/镇静药对老人跌倒风险的影响，值得问一次医生"
+    },
+    {
+      "code": "ESTAZOLAM",
+      "name_zh": "艾司唑仑",
+      "level": "high",
+      "concern": "苯二氮䓬类：跌倒、骨折、认知损害风险升高",
+      "ask_doctor": "同上"
+    },
+    {
+      "code": "ALPRAZOLAM",
+      "name_zh": "阿普唑仑",
+      "level": "high",
+      "concern": "苯二氮䓬类：跌倒、骨折、认知损害风险升高",
+      "ask_doctor": "同上"
+    },
+    {
+      "code": "ZOPICLONE",
+      "name_zh": "佐匹克隆",
+      "level": "low",
+      "concern": "非苯二氮䓬类镇静催眠药：仍有跌倒与次日残留效应",
+      "ask_doctor": "这个助眠药老人吃多久了，是否还需要继续"
+    },
+    {
+      "code": "AMITRIPTYLINE",
+      "name_zh": "阿米替林",
+      "level": "high",
+      "concern": "强抗胆碱作用：口干、便秘、尿潴留、体位性低血压、认知损害",
+      "ask_doctor": "这个药的抗胆碱副作用在老人身上比较明显，可以问问有没有替代"
+    },
+    {
+      "code": "CHLORPHENAMINE",
+      "name_zh": "氯苯那敏",
+      "level": "high",
+      "concern": "第一代抗组胺药，强抗胆碱作用与镇静",
+      "ask_doctor": "这个感冒/过敏药含镇静成分，问问是否必要"
+    },
+    {
+      "code": "DIPHENHYDRAMINE",
+      "name_zh": "苯海拉明",
+      "level": "high",
+      "concern": "第一代抗组胺药，强抗胆碱作用与镇静",
+      "ask_doctor": "同上"
+    },
+    {
+      "code": "INDOMETACIN",
+      "name_zh": "吲哚美辛",
+      "level": "high",
+      "concern": "NSAID 中消化道出血与肾损害风险最高者之一",
+      "ask_doctor": "这个止痛药对胃和肾的负担，问问医生有没有更温和的选择"
+    },
+    {
+      "code": "METOCLOPRAMIDE",
+      "name_zh": "甲氧氯普胺",
+      "level": "high",
+      "concern": "锥体外系反应、迟发性运动障碍风险",
+      "ask_doctor": "这个止吐/促胃动力药建议问问用多久"
+    },
+    {
+      "code": "RESERPINE",
+      "name_zh": "利血平",
+      "level": "high",
+      "concern": "抑郁、镇静、体位性低血压",
+      "ask_doctor": "这是老一代降压药，问问是否有更合适的方案"
+    },
+    {
+      "code": "COMPOUND_RESERPINE",
+      "name_zh": "复方利血平",
+      "level": "high",
+      "concern": "含利血平的复方制剂，同上",
+      "ask_doctor": "同上",
+      "namespace": "combinations"
+    },
+    {
+      "code": "DIGOXIN",
+      "name_zh": "地高辛",
+      "level": "high",
+      "concern": "治疗窗窄，老年人肾功能下降易蓄积中毒；剂量>0.125mg/d 风险显著",
+      "ask_doctor": "这个药需要定期查血药浓度和肾功能，确认一下随访安排"
+    },
+    {
+      "code": "GLIBENCLAMIDE",
+      "name_zh": "格列本脲",
+      "level": "high",
+      "concern": "半衰期长，老年人严重低血糖风险高",
+      "ask_doctor": "这个降糖药低血糖风险较高，问问是否有更适合老人的"
+    },
+    {
+      "code": "SPIRONOLACTONE",
+      "name_zh": "螺内酯",
+      "level": "low",
+      "concern": "高钾血症风险，尤其合并 ACEI/ARB 或肾功能不全时",
+      "ask_doctor": "这个药需要定期查血钾，确认一下多久查一次"
+    },
+    {
+      "code": "AMIODARONE",
+      "name_zh": "胺碘酮",
+      "level": "low",
+      "concern": "甲状腺、肺、肝毒性；需长期监测",
+      "ask_doctor": "这个药需要定期查甲状腺和肝功能"
+    },
+    {
+      "code": "THEOPHYLLINE",
+      "name_zh": "茶碱",
+      "level": "low",
+      "concern": "治疗窗窄，老年人清除率下降",
+      "ask_doctor": "确认一下是否需要监测血药浓度"
+    },
+    {
+      "code": "CLONIDINE",
+      "name_zh": "可乐定",
+      "level": "high",
+      "concern": "中枢性降压药：体位性低血压、镇静、反跳性高血压",
+      "ask_doctor": "这个降压药停药要慢，别自己停"
+    },
+    {
+      "code": "NIFEDIPINE",
+      "name_zh": "硝苯地平普通片",
+      "level": "high",
+      "concern": "速释制剂致血压骤降、反射性心动过速",
+      "ask_doctor": "如果是普通片（不是缓释/控释），问问是否可以换成长效的",
+      "conditional_on_form": "immediate_release",
+      "_comment": "Only the immediate-release tablet is a PIM. safety.check flags this only when the medication's usage/name text shows no 缓释 or 控释 marker."
+    }
+  ],
+  "duplicate_generic_exempt": [
+    "_meta: codes that legitimately appear twice in one regimen (e.g. different routes, or a deliberate split dose). Empty for now — at POC scale, every duplicate goes to the caregiver."
+  ]
+}

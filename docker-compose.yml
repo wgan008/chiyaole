@@ -1,0 +1,42 @@
+# POC deployment: two containers, nothing more (spec §2 — no Celery, no Redis).
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: chiyaole
+      POSTGRES_PASSWORD: chiyaole
+      POSTGRES_DB: chiyaole
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U chiyaole"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://chiyaole:chiyaole@postgres:5432/chiyaole
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    volumes:
+      # ★ app/services/storage.py is a local-disk stand-in for OSS (see its own docstring)
+      # — without this volume, every uploaded photo/audio clip is lost on `docker compose
+      # up` recreating the container, not just on a host reboot.
+      - app_storage:/srv/.local_storage
+    command: >
+      sh -c "alembic upgrade head &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000"
+
+volumes:
+  pgdata:
+  app_storage:

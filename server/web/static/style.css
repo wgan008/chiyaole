@@ -1,0 +1,222 @@
+/* Plain, high-contrast, no framework — matches the wireframe's "plain sentences, no
+   gamification" tone. Optimized for a phone browser inside WeChat's in-app browser.
+   Color tokens copied verbatim from docs/design/02_Wireframe.html's :root so this
+   implementation matches the design doc, not just its own separate palette. */
+
+:root {
+  --brand-yellow: #FFD500;
+  --primary-green: #0B6B33;
+  --true-black: #0A0A0A;
+  --ink: #1a1d21;
+  --ink2: #40474f;
+  --muted: #7b838c;
+  --border: #dfe3e8;
+  --line2: #c8cfd6;
+  --panel: #f6f7f9;
+  --go: #0B6B33;
+  --go-d: #0a5c2b;
+  --stop: #b02a2a;
+  --warn: #9a6200;
+  --acc: #0f766e;
+  --acc-bg: #e6f4f2;
+  --alert-bg: #fbeeed;
+  --alert-border: #b02a2a;
+  --warn-bg: #fdf7ec;
+  --warn-border: #e3c795;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  color: var(--ink);
+  background: #FAFAFA;
+}
+
+.topbar {
+  background: var(--true-black);
+  color: white;
+  padding: 12px 16px;
+}
+
+.topbar .brand {
+  font-weight: 700;
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+.topbar nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.topbar nav a {
+  color: var(--brand-yellow);
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.content {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+h1 {
+  font-size: 20px;
+  margin: 0 0 12px;
+}
+
+.card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.entry-choice-card:active { background: var(--panel); }
+
+.hint {
+  color: var(--muted);
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+button, .btn {
+  background: var(--primary-green);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 12px 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+button:disabled { opacity: 0.5; cursor: default; }
+
+input[type="text"], input[type="tel"], select, textarea {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+
+label { display: block; font-size: 14px; color: var(--muted); margin-bottom: 4px; }
+
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { text-align: left; padding: 8px; border-bottom: 1px solid var(--border); }
+
+.alert {
+  background: var(--alert-bg);
+  border: 1px solid var(--alert-border);
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.state-confirmed { color: var(--primary-green); font-weight: 700; }
+.state-unknown { color: var(--alert-border); font-weight: 700; }
+.state-pending { color: var(--muted); }
+
+.field-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; }
+.field-row input[type="checkbox"] { width: 18px; height: 18px; }
+
+.msg { margin: 12px 0; font-size: 14px; }
+.msg.error { color: var(--alert-border); }
+.msg.ok { color: var(--primary-green); }
+
+/* ---- D1/D2 wireframe primitives (docs/design/02_Wireframe.html) ---- */
+
+.imgbox {
+  background: repeating-linear-gradient(45deg, #edf0f3, #edf0f3 6px, #e3e7ec 6px, #e3e7ec 12px);
+  border: 1px solid var(--line2);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+  overflow: hidden;
+}
+.imgbox img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.capture-tile {
+  border: 2px dashed var(--line2);
+  border-radius: 10px;
+  padding: 22px 10px;
+  text-align: center;
+  background: var(--panel);
+  cursor: pointer;
+}
+.capture-tile .plus { font-size: 30px; line-height: 1; color: var(--muted); }
+.capture-tile .lbl { font-size: 15px; font-weight: 800; margin-top: 7px; }
+.capture-tile .sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+.box-thumb-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.box-thumb { width: 64px; }
+.box-thumb .imgbox { width: 64px; height: 64px; }
+.box-thumb .box-thumb-label { font-size: 10.5px; color: var(--muted); text-align: center; margin-top: 3px; }
+
+.flag { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 3px; letter-spacing: .3px; }
+.f-go { background: #e7f5ec; color: var(--go-d); }
+.f-warn { background: var(--warn-bg); color: var(--warn); }
+.f-stop { background: var(--alert-bg); color: var(--stop); }
+
+.wizard-bar {
+  background: #eceff2;
+  border: 1px solid var(--line2);
+  border-radius: 8px 8px 0 0;
+  padding: 8px 14px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.wizard-body {
+  border: 1px solid var(--line2);
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  background: #fff;
+}
+
+.field-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.field-table th, .field-table td { text-align: left; padding: 8px 9px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.field-table th { background: var(--panel); font-size: 12px; color: var(--ink2); font-weight: 600; }
+.field-table td input[type="text"] {
+  border: 1.5px solid var(--line2);
+  border-radius: 5px;
+  padding: 5px 7px;
+  font-size: 13px;
+  width: 100%;
+  margin: 0;
+}
+.field-table td.bad input[type="text"] { border-color: var(--warn); background: var(--warn-bg); }
+.field-table .warn-note { font-size: 11px; color: var(--warn); margin-left: 5px; white-space: nowrap; }
+.field-table input[type="checkbox"] { width: 18px; height: 18px; }
+
+.btn-ghost {
+  background: #fff;
+  color: var(--ink2);
+  border: 1.5px solid var(--line2);
+  border-radius: 6px;
+  padding: 12px 20px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.followup {
+  background: var(--warn-bg);
+  border: 1px solid var(--warn-border);
+  border-radius: 6px;
+  padding: 11px 13px;
+  margin-top: 11px;
+  font-size: 13px;
+}
+.followup .title { font-weight: 800; color: var(--warn); }

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Monochrome status-bar glyph — "药" alone, no background (docs/design/03_命名与图标.html
+     §05 "交付规格": "notification-bar icon: pure alpha silhouette of 药 only"). Android
+     tints non-transparent pixels to the system's notification-icon color at render time, so
+     a single white fill is enough. Path data is the same PingFang SC Semibold outline as
+     ic_launcher_foreground.xml, re-fit to a standard 24dp status-bar icon canvas. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M2.44,3.59V5.66H7.24V7.08H9.48V5.66H14.52V7.04H16.76V5.66H21.56V3.59H16.76V2.0H14.52V3.59H9.48V2.0H7.24V3.59H2.44ZM11.2,18.25C8.88,18.9 6.12,19.44 2.98,19.83L3.26,21.94C6.23,21.53 8.88,20.97 11.2,20.28V18.25ZM6.17,6.74C5.37,8.33 4.42,9.81 3.35,11.17C3.09,11.52 2.83,11.75 2.55,11.88L3.0,13.63L6.1,13.22C5.26,14.34 4.55,15.13 3.99,15.61C3.73,15.86 3.41,16.06 3.04,16.21L3.6,18.12C5.71,17.89 7.97,17.44 10.34,16.77V14.85C8.9,15.3 7.5,15.67 6.12,15.93C7.39,14.66 8.96,12.68 10.82,9.99L8.81,9.21C8.34,9.97 7.87,10.68 7.41,11.34L5.26,11.6C6.21,10.5 7.16,9.15 8.1,7.51L6.17,6.74ZM14.2,13.43 12.56,14.44C13.64,15.8 14.52,17.03 15.16,18.12L16.78,16.98C16.18,15.97 15.32,14.79 14.2,13.43ZM13.18,7.02C12.62,9.43 11.57,11.45 10.0,13.11L11.29,14.77C12.37,13.67 13.25,12.42 13.96,11.02H18.65C18.63,15.52 18.54,18.15 18.42,18.9C18.26,19.63 17.75,20.02 16.87,20.02C16.0,20.02 14.99,19.98 13.83,19.93L14.33,21.89C15.68,21.96 16.65,22.0 17.21,22.0C19.17,22.0 20.27,21.31 20.5,19.93C20.72,18.56 20.83,14.9 20.83,9.0H14.8C14.97,8.44 15.14,7.86 15.29,7.25L13.18,7.02Z" />
+</vector>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">吃药了</string>
+
+    <!-- Baked-in fallback copy — used only until RemoteConfig has fetched successfully once.
+         Source of truth is data/remote_config.json `copy`; keep these in sync by hand. -->
+    <string name="button_taken">吃了</string>
+    <string name="button_snooze">等会儿吃</string>
+    <string name="button_skip">这次不吃</string>
+    <string name="button_speak">长按说话</string>
+    <string name="button_doctor">给医生看</string>
+
+    <string name="alarm_title_fmt">%1$s，该吃药了</string>
+
+    <string name="refusal_generic_fmt">这个我不能答，我帮你问%1$s</string>
+    <string name="refusal_med_change_fmt">加药减药停药这种事我不能说，我帮你问%1$s</string>
+    <string name="refusal_symptom_fmt">身上不舒服我不能判断，我帮你问%1$s</string>
+    <string name="unresolved_entity_fmt">这个我没找到，我不敢乱猜。我帮你问%1$s</string>
+
+    <!-- Escalation state → wording, spec §7.6. Only DELIVERED may use past tense (已经). -->
+    <string name="escalation_open_fmt">我这就去问%1$s</string>
+    <string name="escalation_sent_fmt">我这就去问%1$s</string>
+    <string name="escalation_delivered_fmt">我已经把话带给%1$s了</string>
+    <string name="escalation_answered_fmt">%1$s回话了，我念给你听</string>
+    <string name="escalation_relayed_fmt">%1$s的话我念给你听过了</string>
+    <string name="escalation_failed_fmt">我没能联系上%1$s，你可以自己打给她</string>
+    <string name="escalation_closed">这件事完了</string>
+
+    <!-- Foreground service persistent notification (spec §4.1 layer 2 — doubles as the
+         pending-dose card, not pure keep-alive noise) -->
+    <string name="keepalive_channel_name">用药提醒</string>
+    <string name="keepalive_channel_desc">保持提醒按时响起</string>
+    <string name="keepalive_notification_title">吃药了正在运行</string>
+    <string name="keepalive_notification_text_idle">今天没有待处理的用药</string>
+
+    <string name="alarm_channel_name">服药提醒</string>
+    <string name="alarm_channel_desc">到点提醒吃药</string>
+
+    <!-- Permission setup screen, spec §3.5② — shown to the adult child, not the elder -->
+    <string name="permission_setup_title">安装好了，还差几步</string>
+    <string name="permission_step_exact_alarm">允许准时提醒</string>
+    <string name="permission_step_notifications">允许通知</string>
+    <string name="permission_step_battery">关闭电池优化限制</string>
+    <string name="permission_step_autostart">允许自启动</string>
+    <string name="permission_open_settings">去设置</string>
+    <string name="permission_recheck">我已经设置好了</string>
+</resources>

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}今天 - 吃药了{% endblock %}
+{% block content %}
+<h1>今天</h1>
+<p class="hint">三种状态：已确认吃了、还没到时间、到时间了但没确认。第三种不代表没吃 — 只是不知道，
+  这是老实话，不是"没做好"。</p>
+<div class="card">
+  <h2 style="font-size:16px;margin:0 0 8px">已确认</h2>
+  <table id="confirmed"><tbody></tbody></table>
+</div>
+<div class="card">
+  <h2 style="font-size:16px;margin:0 0 8px">没到时间</h2>
+  <table id="pending"><tbody></tbody></table>
+</div>
+<div class="card">
+  <h2 style="font-size:16px;margin:0 0 8px">不知道（到时间了但没确认）</h2>
+  <table id="unknown"><tbody></tbody></table>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+function row(dose) {
+  const time = new Date(dose.scheduled_at).toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" });
+  return `<tr><td>${time}</td><td>${dose.medication}</td></tr>`;
+}
+
+async function load() {
+  const today = await apiGet(`/api/patient/${window.CHIYAOLE.patientId}/today`);
+  document.querySelector("#confirmed tbody").innerHTML = today.confirmed.map(row).join("") || "<tr><td class=\"hint\">暂无</td></tr>";
+  document.querySelector("#pending tbody").innerHTML = today.pending.map(row).join("") || "<tr><td class=\"hint\">暂无</td></tr>";
+  document.querySelector("#unknown tbody").innerHTML = today.unknown.map(row).join("") || "<tr><td class=\"hint\">暂无</td></tr>";
+}
+
+load();
+</script>
+{% endblock %}

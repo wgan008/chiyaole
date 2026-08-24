@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+{% block title %}拍照识别 - 吃药了{% endblock %}
+{% block content %}
+<div id="entryChoice">
+  <h1>给老人建一份用药表</h1>
+  <p class="hint">把家里的药盒拍下来就行，大概 5 分钟。<br>
+    照片只你和老人能看到，不上传通讯录、不读相册。</p>
+  <div class="card entry-choice-card" id="choiceBox" style="display:flex;gap:10px;align-items:center;cursor:pointer">
+    <div class="imgbox" style="width:40px;height:40px;flex:0 0 40px;font-size:9px">盒</div>
+    <div><div style="font-size:14px;font-weight:700">拍药盒</div>
+      <div class="hint" style="margin:0">最常见，先拍这个</div></div>
+  </div>
+  <div class="card entry-choice-card" id="choiceBag" style="display:flex;gap:10px;align-items:center;cursor:pointer">
+    <div class="imgbox" style="width:40px;height:40px;flex:0 0 40px;font-size:9px">袋</div>
+    <div><div style="font-size:14px;font-weight:700">拍药袋标签</div>
+      <div class="hint" style="margin:0">医院配的药，<b>标签上有医生的用法</b></div></div>
+  </div>
+  <div class="card entry-choice-card" id="choiceLab" style="display:flex;gap:10px;align-items:center;cursor:pointer">
+    <div class="imgbox" style="width:40px;height:40px;flex:0 0 40px;font-size:9px">单</div>
+    <div><div style="font-size:14px;font-weight:700">拍化验单 / 出院小结</div>
+      <div class="hint" style="margin:0">可以之后再补</div></div>
+  </div>
+</div>
+
+<div id="captureFlow" style="display:none">
+  <h1 id="captureTitle">拍下药盒</h1>
+  <p class="hint" id="captureHint">每盒拍一张（字朝上、整盒入镜），
+    如果这一面没写用法用量，可以再拍一张反面。<br>
+    识别只是把照片上的字读出来，不会判断该不该吃 — 等你在下一步确认过，才会生效。</p>
+
+  <div id="thumbs" class="box-thumb-row"></div>
+
+  <div id="addSideRow" style="margin-bottom:8px; display:none">
+    <button id="addSideBtn" class="btn-ghost" type="button">+ 这盒的另一面（没写完用法的话）</button>
+  </div>
+
+  <div id="captureTile" class="capture-tile">
+    <div class="plus">＋</div>
+    <div class="lbl" id="captureTileLbl">拍下一盒</div>
+    <div class="sub">点这里调起相机</div>
+  </div>
+  <input type="file" id="fileInput" accept="image/*" capture="environment" style="display:none">
+
+  <div style="margin-top:16px" id="identifyRow"></div>
+  <div id="msg" class="msg"></div>
+  <div id="summary"></div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+// ★ Matches docs/design/02_Wireframe.html D1b: capture is sequential, one photo at a time
+// via <input capture> (a real webview limitation — no live camera preview), thumbnails
+// accumulate, "连续拍多盒，不逐盒打断" (photograph multiple boxes continuously, without
+// per-box interruption). Each BOX may hold 1-2 photos (front, optionally back) — those are
+// sent together as one parse_medbox call; DIFFERENT boxes are always separate calls.
+// agent/vision.py's parse_medbox() is documented to assume exactly one box per call, so a
+// box's photos are only ever combined with each other, never with another box's.
+// ★ Wireframe D1a: the entry screen offers three capture types. 拍药盒/拍药袋标签 both feed
+// the SAME parse_medbox call downstream — agent/vision.py already reads whatever usage text
+// is in the photo, box or pharmacy label alike — so the split here is only about setting
+// the right expectation before the camera opens, not a different backend path. 拍化验单
+// goes to a genuinely different pipeline (parse_lab, its own page).
+document.getElementById("choiceBox").addEventListener("click", () => enterCaptureFlow("box"));
+document.getElementById("choiceBag").addEventListener("click", () => enterCaptureFlow("bag"));
+document.getElementById("choiceLab").addEventListener("click", () => {
+  window.location.href = `/web/${window.CHIYAOLE.patientId}/lab?t=${window.CHIYAOLE.token}`;
+});
+
+function enterCaptureFlow(kind) {
+  document.getElementById("entryChoice").style.display = "none";
+  document.getElementById("captureFlow").style.display = "block";
+  if (kind === "bag") {
+    document.getElementById("captureTitle").textContent = "拍下药袋标签";
+    document.getElementById("captureHint").innerHTML =
+      "药师贴的标签上常常有医生实际开的用法，比说明书更准。<br>" +
+      "识别只是把照片上的字读出来，不会判断该不该吃 — 等你在下一步确认过，才会生效。";
+    document.getElementById("captureTileLbl").textContent = "拍下一个标签";
+  }
+}
+
+let boxes = [];
+let nextBoxId = 1;
+let activeBox = null; // the box "+ 这盒的另一面" will add to
+
+const thumbsEl = document.getElementById("thumbs");
+const captureTile = document.getElementById("captureTile");
+const fileInput = document.getElementById("fileInput");
+const addSideRow = document.getElementById("addSideRow");
+const identifyRow = document.getElementById("identifyRow");
+const msgEl = document.getElementById("msg");
+const summaryEl = document.getElementById("summary");
+
+captureTile.addEventListener("click", () => {
+  activeBox = null; // a fresh tap on the big tile always starts a NEW box
+  fileInput.click();
+});
+document.getElementById("addSideBtn").addEventListener("click", () => {
+  // activeBox is already set to the most recently added box — just reopen the picker
+  fileInput.click();
+});
+
+fileInput.addEventListener("change", () => {
+  const file = fileInput.files[0];
+  fileInput.value = "";
+  if (!file) return;
+
+  if (activeBox) {
+    activeBox.files.push(file);
+  } else {
+    activeBox = { id: nextBoxId++, files: [file], status: "staged" };
+    boxes.push(activeBox);
+  }
+  renderThumbs();
+  addSideRow.style.display = activeBox.files.length < 2 ? "block" : "none";
+  renderIdentifyRow();
+});
+
+function renderThumbs() {
+  thumbsEl.innerHTML = boxes.map(box => `
+    <div class="box-thumb">
+      <div class="imgbox">
+        <img src="${URL.createObjectURL(box.files[0])}" alt="">
+      </div>
+      <div class="box-thumb-label">
+        ${box.files.length > 1 ? `${box.files.length} 张 · ` : ""}${statusLabel(box)}
+      </div>
+    </div>`).join("");
+}
+
+function statusLabel(box) {
+  if (box.status === "staged") return "待识别";
+  if (box.status === "parsing") return "识别中…";
+  if (box.status === "error") return `<span class="flag f-stop">失败</span>`;
+  if (box.status === "ok") {
+    return box.missing && box.missing.length
+      ? `<span class="flag f-warn">缺${box.missing.includes("usage_raw") ? "用法" : "信息"}</span>`
+      : `<span class="flag f-go">好了</span>`;
+  }
+  return "";
+}
+
+function renderIdentifyRow() {
+  identifyRow.innerHTML = boxes.length
+    ? `<button id="identifyBtn">${boxes.length} 盒拍完了，识别</button>`
+    : "";
+  const btn = document.getElementById("identifyBtn");
+  if (btn) btn.addEventListener("click", identifyAll);
+}
+
+async function identifyAll() {
+  const btn = document.getElementById("identifyBtn");
+  btn.disabled = true;
+  summaryEl.innerHTML = "";
+
+  for (let i = 0; i < boxes.length; i++) {
+    const box = boxes[i];
+    if (box.status === "ok") continue; // already identified in a previous pass
+    box.status = "parsing";
+    renderThumbs();
+    showMsg(msgEl, `正在识别第 ${i + 1}/${boxes.length} 盒…`, "");
+    try {
+      const assetIds = [];
+      for (const file of box.files) {
+        const form = new FormData();
+        form.append("kind", "medbox");
+        form.append("file", file);
+        const asset = await apiPostForm("/api/assets", form);
+        assetIds.push(asset.asset_id);
+      }
+      const draft = await apiPostJson("/api/parse/medbox", { asset_ids: assetIds });
+      const item = draft.items[draft.items.length - 1];
+      box.status = "ok";
+      box.name = item.generic_name || "(未识别)";
+      box.missing = item.missing || [];
+    } catch (err) {
+      box.status = "error";
+      box.error = err.message;
+    }
+    renderThumbs();
+  }
+
+  showMsg(msgEl, "识别完成，见下方清单。", "ok");
+  renderSummary();
+  btn.disabled = false;
+}
+
+function renderSummary() {
+  // ★ Wireframe D1e: only two states shown — 好了 / 补一张 — never a confidence number.
+  summaryEl.innerHTML = `
+    <div class="card">
+      <div style="font-weight:800; margin-bottom:8px">一共 ${boxes.length} 盒药</div>
+      ${boxes.map(box => `
+        <div style="display:flex; gap:8px; align-items:center; padding:6px 0; border-bottom:1px solid var(--border)">
+          <div class="imgbox" style="width:34px;height:34px;flex:0 0 34px">
+            <img src="${URL.createObjectURL(box.files[0])}" alt="">
+          </div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:700">${box.name || "(识别失败)"}</div>
+            <div style="font-size:11px;color:var(--muted)">${box.files.length} 张${box.error ? " · " + box.error : ""}</div>
+          </div>
+          ${statusLabel(box)}
+        </div>`).join("")}
+      <a class="btn" style="display:block;text-align:center;text-decoration:none;margin-top:14px"
+         href="/web/${window.CHIYAOLE.patientId}/confirm?t=${window.CHIYAOLE.token}">下一步：核对内容 ›</a>
+    </div>`;
+}
+</script>
+{% endblock %}

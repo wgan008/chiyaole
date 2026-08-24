@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Debug-variant manifest override — merged into the main manifest only for debug builds.
+     Adds the cleartext exception for 10.0.2.2 (network_security_config.xml) without
+     touching the release manifest's usesCleartextTraffic="false". -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application android:networkSecurityConfig="@xml/network_security_config" />
+</manifest>

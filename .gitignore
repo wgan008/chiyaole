@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+.coverage
+htmlcov/
+
+# Secrets — never commit
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+server/.env
+
+# Android
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android/.idea/
+*.apk
+*.aab
+*.jks
+*.keystore
+
+# Local dev DB/storage stand-ins — never real data, never committed
+server/.local_storage/
+
+# Real user data — MUST NOT be committed (spec §8.6)
+evals/asr_samples/*.wav
+evals/asr_samples/*.m4a
+evals/labs/real/
+field-notes/*-private.md
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

@@ -1,0 +1,83 @@
+{
+  "_meta": {
+    "schema": "lab_codes/v1",
+    "purpose": "Normalise the verbatim metric name printed on a Chinese lab report to a canonical code, and convert its unit.",
+    "rules": [
+      "canonical_unit is the unit every stored value is converted to. Never store the printed unit.",
+      "units[u] is the multiplicative factor that converts a value FROM unit u TO canonical_unit.",
+      "If a metric is printed in a unit not listed here, resolve_lab returns None. Do NOT assume the canonical unit.",
+      "ref_low/ref_high are population defaults for orientation ONLY. The report's own printed reference range always wins — labs differ.",
+      "TODO: 72 metrics here. Spec DoD asks for 200. Grow this from the real reports you collect, not from a model."
+    ],
+    "updated": "2026-08"
+  },
+  "metrics": {
+    "GLU":      {"name_zh": "空腹血糖",   "aliases": ["血糖", "葡萄糖", "空腹血糖", "GLU", "血浆葡萄糖", "空腹葡萄糖"], "canonical_unit": "mmol/L", "units": {"mmol/L": 1.0, "mg/dL": 0.05551, "mg/dl": 0.05551}, "ref_low": 3.9, "ref_high": 6.1, "category": "代谢"},
+    "HBA1C":    {"name_zh": "糖化血红蛋白", "aliases": ["糖化血红蛋白", "糖化", "HbA1c", "HBA1C", "GHb"], "canonical_unit": "%", "units": {"%": 1.0}, "ref_low": 4.0, "ref_high": 6.0, "category": "代谢"},
+    "CREA":     {"name_zh": "肌酐",       "aliases": ["肌酐", "血肌酐", "CREA", "Cr", "CR", "SCr", "肌酐(酶法)"], "canonical_unit": "umol/L", "units": {"umol/L": 1.0, "μmol/L": 1.0, "µmol/L": 1.0, "mg/dL": 88.4, "mg/dl": 88.4}, "ref_low": 44, "ref_high": 106, "category": "肾功能"},
+    "UREA":     {"name_zh": "尿素",       "aliases": ["尿素", "尿素氮", "血尿素氮", "UREA", "BUN", "Urea"], "canonical_unit": "mmol/L", "units": {"mmol/L": 1.0, "mg/dL": 0.357, "mg/dl": 0.357}, "ref_low": 2.9, "ref_high": 8.2, "category": "肾功能"},
+    "UA":       {"name_zh": "尿酸",       "aliases": ["尿酸", "血尿酸", "UA", "URIC"], "canonical_unit": "umol/L", "units": {"umol/L": 1.0, "μmol/L": 1.0, "µmol/L": 1.0, "mg/dL": 59.48, "mg/dl": 59.48}, "ref_low": 155, "ref_high": 428, "category": "肾功能"},
+    "EGFR":     {"name_zh": "估算肾小球滤过率", "aliases": ["eGFR", "EGFR", "估算肾小球滤过率", "肾小球滤过率"], "canonical_unit": "mL/min/1.73m2", "units": {"mL/min/1.73m2": 1.0, "ml/min/1.73m2": 1.0, "mL/min": 1.0}, "ref_low": 90, "ref_high": null, "category": "肾功能"},
+
+    "TC":       {"name_zh": "总胆固醇",   "aliases": ["总胆固醇", "胆固醇", "TC", "CHOL", "TCHO"], "canonical_unit": "mmol/L", "units": {"mmol/L": 1.0, "mg/dL": 0.02586, "mg/dl": 0.02586}, "ref_low": null, "ref_high": 5.18, "category": "血脂"},
+    "TG":       {"name_zh": "甘油三酯",   "aliases": ["甘油三酯", "三酰甘油", "TG", "TRIG"], "canonical_unit": "mmol/L", "units": {"mmol/L": 1.0, "mg/dL": 0.01129, "mg/dl": 0.01129}, "ref_low": null, "ref_high": 1.7, "category": "血脂"},
+    "LDLC":     {"name_zh": "低密度脂蛋白胆固醇", "aliases": ["低密度脂蛋白胆固醇", "低密度脂蛋白", "LDL-C", "LDLC", "LDL"], "canonical_unit": "mmol/L", "units": {"mmol/L": 1.0, "mg/dL": 0.02586, "mg/dl": 0.02586}, "ref_low": null, "ref_high": 3.37, "category": "血脂"},
+    "HDLC":     {"name_zh": "高密度脂蛋白胆固醇", "aliases": ["高密度脂蛋白胆固醇", "高密度脂蛋白", "HDL-C", "HDLC", "HDL"], "canonical_unit": "mmol/L", "units": {"mmol/L": 1.0, "mg/dL": 0.02586, "mg/dl": 0.02586}, "ref_low": 1.04, "ref_high": null, "category": "血脂"},
+    "LPA":      {"name_zh": "脂蛋白a",    "aliases": ["脂蛋白a", "脂蛋白(a)", "Lp(a)", "LPA"], "canonical_unit": "mg/L", "units": {"mg/L": 1.0, "mg/dL": 10.0}, "ref_low": null, "ref_high": 300, "category": "血脂"},
+    "APOA1":    {"name_zh": "载脂蛋白A1", "aliases": ["载脂蛋白A1", "载脂蛋白AI", "ApoA1", "APOA1"], "canonical_unit": "g/L", "units": {"g/L": 1.0}, "ref_low": 1.0, "ref_high": 1.6, "category": "血脂"},
+    "APOB":     {"name_zh": "载脂蛋白B",  "aliases": ["载脂蛋白B", "ApoB", "APOB"], "canonical_unit": "g/L", "units": {"g/L": 1.0}, "ref_low": 0.6, "ref_high": 1.1, "category": "血脂"},
+
+    "ALT":      {"name_zh": "丙氨酸氨基转移酶", "aliases": ["丙氨酸氨基转移酶", "谷丙转氨酶", "ALT", "GPT"], "canonical_unit": "U/L", "units": {"U/L": 1.0, "IU/L": 1.0}, "ref_low": 7, "ref_high": 40, "category": "肝功能"},
+    "AST":      {"name_zh": "天门冬氨酸氨基转移酶", "aliases": ["天门冬氨酸氨基转移酶", "谷草转氨酶", "AST", "GOT"], "canonical_unit": "U/L", "units": {"U/L": 1.0, "IU/L": 1.0}, "ref_low": 13, "ref_high": 35, "category": "肝功能"},
+    "GGT":      {"name_zh": "谷氨酰转肽酶", "aliases": ["谷氨酰转肽酶", "γ-谷氨酰转肽酶", "GGT", "γ-GT"], "canonical_unit": "U/L", "units": {"U/L": 1.0, "IU/L": 1.0}, "ref_low": 7, "ref_high": 45, "category": "肝功能"},
+    "ALP":      {"name_zh": "碱性磷酸酶", "aliases": ["碱性磷酸酶", "ALP", "AKP"], "canonical_unit": "U/L", "units": {"U/L": 1.0, "IU/L": 1.0}, "ref_low": 35, "ref_high": 100, "category": "肝功能"},
+    "TBIL":     {"name_zh": "总胆红素",   "aliases": ["总胆红素", "TBIL", "T-BIL", "TBil"], "canonical_unit": "umol/L", "units": {"umol/L": 1.0, "μmol/L": 1.0, "µmol/L": 1.0, "mg/dL": 17.1}, "ref_low": 3.4, "ref_high": 20.5, "category": "肝功能"},
+    "DBIL":     {"name_zh": "直接胆红素", "aliases": ["直接胆红素", "结合胆红素", "DBIL", "D-BIL"], "canonical_unit": "umol/L", "units": {"umol/L": 1.0, "μmol/L": 1.0, "µmol/L": 1.0, "mg/dL": 17.1}, "ref_low": 0, "ref_high": 6.8, "category": "肝功能"},
+    "ALB":      {"name_zh": "白蛋白",     "aliases": ["白蛋白", "血清白蛋白", "ALB"], "canonical_unit": "g/L", "units": {"g/L": 1.0, "g/dL": 10.0}, "ref_low": 40, "ref_high": 55, "category": "肝功能"},
+    "TP":       {"name_zh": "总蛋白",     "aliases": ["总蛋白", "血清总蛋白", "TP"], "canonical_unit": "g/L", "units": {"g/L": 1.0, "g/dL": 10.0}, "ref_low": 65, "ref_high": 85, "category": "肝功能"},
+
+    "WBC":      {"name_zh": "白细胞计数", "aliases": ["白细胞计数", "白细胞", "WBC"], "canonical_unit": "10^9/L", "units": {"10^9/L": 1.0, "*10^9/L": 1.0, "10E9/L": 1.0, "K/uL": 1.0}, "ref_low": 3.5, "ref_high": 9.5, "category": "血常规"},
+    "RBC":      {"name_zh": "红细胞计数", "aliases": ["红细胞计数", "红细胞", "RBC"], "canonical_unit": "10^12/L", "units": {"10^12/L": 1.0, "*10^12/L": 1.0, "10E12/L": 1.0}, "ref_low": 3.8, "ref_high": 5.8, "category": "血常规"},
+    "HGB":      {"name_zh": "血红蛋白",   "aliases": ["血红蛋白", "血色素", "HGB", "HB", "Hb"], "canonical_unit": "g/L", "units": {"g/L": 1.0, "g/dL": 10.0}, "ref_low": 115, "ref_high": 175, "category": "血常规"},
+    "PLT":      {"name_zh": "血小板计数", "aliases": ["血小板计数", "血小板", "PLT"], "canonical_unit": "10^9/L", "units": {"10^9/L": 1.0, "*10^9/L": 1.0, "10E9/L": 1.0}, "ref_low": 125, "ref_high": 350, "category": "血常规"},
+    "HCT":      {"name_zh": "红细胞压积", "aliases": ["红细胞压积", "血细胞比容", "HCT"], "canonical_unit": "%", "units": {"%": 1.0, "L/L": 100.0}, "ref_low": 35, "ref_high": 50, "category": "血常规"},
+    "MCV":      {"name_zh": "平均红细胞体积", "aliases": ["平均红细胞体积", "MCV"], "canonical_unit": "fL", "units": {"fL": 1.0}, "ref_low": 82, "ref_high": 100, "category": "血常规"},
+    "NEUT_PCT": {"name_zh": "中性粒细胞百分比", "aliases": ["中性粒细胞百分比", "中性粒细胞比率", "NEUT%", "N%"], "canonical_unit": "%", "units": {"%": 1.0}, "ref_low": 40, "ref_high": 75, "category": "血常规"},
+    "LYMPH_PCT":{"name_zh": "淋巴细胞百分比", "aliases": ["淋巴细胞百分比", "淋巴细胞比率", "LYMPH%", "L%"], "canonical_unit": "%", "units": {"%": 1.0}, "ref_low": 20, "ref_high": 50, "category": "血常规"},
+
+    "K":        {"name_zh": "钾",  "aliases": ["钾", "血钾", "K", "K+"], "canonical_unit": "mmol/L", "units": {"mmol/L": 1.0, "mEq/L": 1.0}, "ref_low": 3.5, "ref_high": 5.3, "category": "电解质"},
+    "NA":       {"name_zh": "钠",  "aliases": ["钠", "血钠", "Na", "Na+"], "canonical_unit": "mmol/L", "units": {"mmol/L": 1.0, "mEq/L": 1.0}, "ref_low": 137, "ref_high": 147, "category": "电解质"},
+    "CL":       {"name_zh": "氯",  "aliases": ["氯", "血氯", "Cl", "Cl-"], "canonical_unit": "mmol/L", "units": {"mmol/L": 1.0, "mEq/L": 1.0}, "ref_low": 99, "ref_high": 110, "category": "电解质"},
+    "CA":       {"name_zh": "钙",  "aliases": ["钙", "血钙", "Ca", "总钙"], "canonical_unit": "mmol/L", "units": {"mmol/L": 1.0, "mg/dL": 0.2495}, "ref_low": 2.11, "ref_high": 2.52, "category": "电解质"},
+    "P":        {"name_zh": "磷",  "aliases": ["磷", "无机磷", "血磷", "P"], "canonical_unit": "mmol/L", "units": {"mmol/L": 1.0, "mg/dL": 0.3229}, "ref_low": 0.85, "ref_high": 1.51, "category": "电解质"},
+    "MG":       {"name_zh": "镁",  "aliases": ["镁", "血镁", "Mg"], "canonical_unit": "mmol/L", "units": {"mmol/L": 1.0, "mg/dL": 0.4114}, "ref_low": 0.75, "ref_high": 1.02, "category": "电解质"},
+
+    "TSH":      {"name_zh": "促甲状腺激素", "aliases": ["促甲状腺激素", "TSH", "促甲状腺素"], "canonical_unit": "mIU/L", "units": {"mIU/L": 1.0, "uIU/mL": 1.0, "μIU/mL": 1.0, "µIU/mL": 1.0}, "ref_low": 0.27, "ref_high": 4.2, "category": "甲状腺"},
+    "FT3":      {"name_zh": "游离三碘甲状腺原氨酸", "aliases": ["游离三碘甲状腺原氨酸", "游离T3", "FT3"], "canonical_unit": "pmol/L", "units": {"pmol/L": 1.0}, "ref_low": 3.1, "ref_high": 6.8, "category": "甲状腺"},
+    "FT4":      {"name_zh": "游离甲状腺素", "aliases": ["游离甲状腺素", "游离T4", "FT4"], "canonical_unit": "pmol/L", "units": {"pmol/L": 1.0}, "ref_low": 12, "ref_high": 22, "category": "甲状腺"},
+
+    "CRP":      {"name_zh": "C反应蛋白", "aliases": ["C反应蛋白", "CRP", "超敏C反应蛋白", "hs-CRP"], "canonical_unit": "mg/L", "units": {"mg/L": 1.0, "mg/dL": 10.0}, "ref_low": null, "ref_high": 8, "category": "炎症"},
+    "ESR":      {"name_zh": "红细胞沉降率", "aliases": ["红细胞沉降率", "血沉", "ESR"], "canonical_unit": "mm/h", "units": {"mm/h": 1.0}, "ref_low": null, "ref_high": 20, "category": "炎症"},
+
+    "INR":      {"name_zh": "国际标准化比值", "aliases": ["国际标准化比值", "INR"], "canonical_unit": "", "units": {"": 1.0}, "ref_low": 0.8, "ref_high": 1.2, "category": "凝血"},
+    "PT":       {"name_zh": "凝血酶原时间", "aliases": ["凝血酶原时间", "PT"], "canonical_unit": "s", "units": {"s": 1.0, "sec": 1.0, "秒": 1.0}, "ref_low": 11, "ref_high": 14, "category": "凝血"},
+    "APTT":     {"name_zh": "活化部分凝血活酶时间", "aliases": ["活化部分凝血活酶时间", "APTT"], "canonical_unit": "s", "units": {"s": 1.0, "sec": 1.0, "秒": 1.0}, "ref_low": 25, "ref_high": 37, "category": "凝血"},
+    "DDIMER":   {"name_zh": "D-二聚体", "aliases": ["D-二聚体", "D二聚体", "D-Dimer", "DD"], "canonical_unit": "mg/L FEU", "units": {"mg/L FEU": 1.0, "mg/L": 1.0, "ug/mL FEU": 1.0}, "ref_low": null, "ref_high": 0.5, "category": "凝血"},
+
+    "BNP":      {"name_zh": "脑钠肽", "aliases": ["脑钠肽", "BNP", "B型钠尿肽"], "canonical_unit": "pg/mL", "units": {"pg/mL": 1.0, "ng/L": 1.0}, "ref_low": null, "ref_high": 100, "category": "心脏"},
+    "NTPROBNP": {"name_zh": "N末端脑钠肽前体", "aliases": ["N末端脑钠肽前体", "NT-proBNP", "NTproBNP", "NT-ProBNP"], "canonical_unit": "pg/mL", "units": {"pg/mL": 1.0, "ng/L": 1.0}, "ref_low": null, "ref_high": 125, "category": "心脏"},
+    "CKMB":     {"name_zh": "肌酸激酶同工酶", "aliases": ["肌酸激酶同工酶", "CK-MB", "CKMB"], "canonical_unit": "U/L", "units": {"U/L": 1.0, "IU/L": 1.0}, "ref_low": null, "ref_high": 25, "category": "心脏"},
+    "CK":       {"name_zh": "肌酸激酶", "aliases": ["肌酸激酶", "CK", "CPK"], "canonical_unit": "U/L", "units": {"U/L": 1.0, "IU/L": 1.0}, "ref_low": 38, "ref_high": 174, "category": "心脏"},
+    "TNI":      {"name_zh": "肌钙蛋白I", "aliases": ["肌钙蛋白I", "cTnI", "TnI", "高敏肌钙蛋白I"], "canonical_unit": "ng/mL", "units": {"ng/mL": 1.0, "ug/L": 1.0}, "ref_low": null, "ref_high": 0.04, "category": "心脏"},
+
+    "URINE_PRO":{"name_zh": "尿蛋白", "aliases": ["尿蛋白", "蛋白质", "PRO", "尿常规蛋白"], "canonical_unit": "定性", "units": {"定性": 1.0}, "ref_low": null, "ref_high": null, "category": "尿常规"},
+    "UACR":     {"name_zh": "尿微量白蛋白肌酐比", "aliases": ["尿微量白蛋白肌酐比", "尿白蛋白肌酐比", "UACR", "ACR"], "canonical_unit": "mg/g", "units": {"mg/g": 1.0, "mg/mmol": 8.84}, "ref_low": null, "ref_high": 30, "category": "尿常规"},
+    "MALB":     {"name_zh": "尿微量白蛋白", "aliases": ["尿微量白蛋白", "微量白蛋白", "mALB"], "canonical_unit": "mg/L", "units": {"mg/L": 1.0}, "ref_low": null, "ref_high": 20, "category": "尿常规"},
+
+    "SBP":      {"name_zh": "收缩压", "aliases": ["收缩压", "高压", "SBP"], "canonical_unit": "mmHg", "units": {"mmHg": 1.0}, "ref_low": 90, "ref_high": 140, "category": "生命体征"},
+    "DBP":      {"name_zh": "舒张压", "aliases": ["舒张压", "低压", "DBP"], "canonical_unit": "mmHg", "units": {"mmHg": 1.0}, "ref_low": 60, "ref_high": 90, "category": "生命体征"},
+    "HR":       {"name_zh": "心率", "aliases": ["心率", "脉搏", "HR"], "canonical_unit": "bpm", "units": {"bpm": 1.0, "次/分": 1.0}, "ref_low": 60, "ref_high": 100, "category": "生命体征"},
+    "WEIGHT":   {"name_zh": "体重", "aliases": ["体重"], "canonical_unit": "kg", "units": {"kg": 1.0, "公斤": 1.0, "斤": 0.5, "g": 0.001}, "ref_low": null, "ref_high": null, "category": "生命体征"},
+    "BMI":      {"name_zh": "体质指数", "aliases": ["体质指数", "BMI", "体重指数"], "canonical_unit": "kg/m2", "units": {"kg/m2": 1.0}, "ref_low": 18.5, "ref_high": 24, "category": "生命体征"}
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "_meta": {
+    "schema": "remote_config/v1",
+    "purpose": "Wording, timings and feature flags. ★ Edit here — changing any of this must NOT require shipping a new APK.",
+    "fetched": "once daily by the elder device via GET /api/config; the device always keeps the last good copy and falls back to the values baked into the APK if it has never fetched successfully",
+    "updated": "2026-08"
+  },
+
+  "alarm": {
+    "screen_on_to_speech_delay_ms": 400,
+    "_comment_delay": "★ Screen lights BEFORE speech (spec §3.4-③). On a Kirin 710A this gap must stay ≤500 ms — never audio over a black screen.",
+    "ring_series": [0, 600000, 1800000],
+    "_comment_ring_series": "Offsets in ms from scheduled_at for ring 1/2/3. 0, +10 min, +30 min.",
+    "auto_dismiss_ms": 120000,
+    "snooze_minutes": 15,
+    "max_snoozes": 2,
+    "defer_during_call": true,
+    "_comment_call": "A dose due during a phone call waits until the call ends. It never interrupts a call (spec §4.4).",
+    "missed_after_minutes": 60
+  },
+
+  "escalation": {
+    "missed_dose_threshold": 2,
+    "_comment_missed": "Consecutive unconfirmed doses before a MISSED_DOSE escalation is raised.",
+    "retry_backoff_seconds": [60, 300, 1800, 7200, 21600, 86400],
+    "max_retry_days": 7,
+    "urgency_by_kind": {
+      "SYMPTOM": 1,
+      "MED_CHANGE": 2,
+      "OUT_OF_STOCK": 3,
+      "MISSED_DOSE": 3,
+      "REGIMEN_STALE": 4,
+      "UNRESOLVED_ENTITY": 4
+    }
+  },
+
+  "copy": {
+    "_comment": "★ Wording is bound to escalation state as an ASSERTION, not a convention (spec §7.6). A unit test enforces that no pre-delivery string contains 「已经」.",
+    "escalation_state_messages": {
+      "OPEN":      "我这就去问{caregiver}",
+      "SENT":      "我这就去问{caregiver}",
+      "DELIVERED": "我已经把话带给{caregiver}了",
+      "ANSWERED":  "{caregiver}回话了，我念给你听",
+      "RELAYED":   "{caregiver}的话我念给你听过了",
+      "FAILED":    "我没能联系上{caregiver}，你可以自己打给她",
+      "CLOSED":    "这件事完了"
+    },
+    "alarm_title": "{name}，该吃药了",
+    "button_taken": "吃了",
+    "button_snooze": "等会儿吃",
+    "button_skip": "这次不吃",
+    "button_speak": "长按说话",
+    "button_doctor": "给医生看",
+    "refusal_generic": "这个我不能答，我帮你问{caregiver}",
+    "refusal_med_change": "加药减药停药这种事我不能说，我帮你问{caregiver}",
+    "refusal_symptom": "身上不舒服我不能判断，我帮你问{caregiver}",
+    "unresolved_entity": "这个我没找到，我不敢乱猜。我帮你问{caregiver}"
+  },
+
+  "tts": {
+    "rate": 0.85,
+    "pitch": 1.0,
+    "_comment_rate": "0.85 measured as comfortable for 70+ listeners. Do not go below 0.7 — it starts sounding condescending."
+  },
+
+  "ui": {
+    "min_text_sp": 24,
+    "primary_text_sp": 40,
+    "button_min_height_dp": 96,
+    "_comment_font": "Layout must survive 1.75× system font scaling (spec §3.4-④). Never hard-code heights.",
+    "colors": {
+      "primary_green": "#0B6B33",
+      "brand_yellow": "#FFD500",
+      "true_black": "#0A0A0A"
+    }
+  },
+
+  "flags": {
+    "voice_qa_enabled": true,
+    "lab_report_enabled": true,
+    "doctor_view_enabled": true,
+    "lockscreen_schedule_enabled": true
+  }
+}

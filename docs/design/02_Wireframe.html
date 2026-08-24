@@ -1,0 +1,1405 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>老人健康助手 · Wireframe</title>
+<style>
+  :root{
+    --ink:#1a1d21;--ink2:#40474f;--mute:#7b838c;--line:#dfe3e8;--line2:#c8cfd6;
+    --bg:#fff;--panel:#f6f7f9;--paper:#fcfcfd;
+    /* 主按钮绿已加深：白字对比 3.4:1 → 7.4:1（WCAG AAA），见《命名与图标》§02 */
+    --go:#0B6B33;--go-lt:#34d17a;--go-d:#0a5c2b;--brand:#FFD500;
+    --stop:#b02a2a;--warn:#9a6200;--acc:#0f766e;--acc-bg:#e6f4f2;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.7;
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .wrap{max-width:1180px;margin:0 auto;padding:52px 30px 96px}
+  header{border-bottom:3px solid var(--ink);padding-bottom:20px;margin-bottom:10px}
+  h1{font-size:29px;margin:0 0 7px;font-weight:700;letter-spacing:-.4px}
+  .sub{color:var(--mute);font-size:13.5px}
+  h2{font-size:19px;margin:52px 0 4px;padding-top:20px;border-top:1px solid var(--line);font-weight:700}
+  h2 .n{color:var(--acc);margin-right:9px;font-variant-numeric:tabular-nums}
+  h3{font-size:14.5px;margin:26px 0 4px;font-weight:700}
+  .lead{color:var(--ink2);font-size:14px;margin:5px 0 14px}
+  p{margin:9px 0}
+
+  /* ---- screen grid ---- */
+  .screens{display:flex;flex-wrap:wrap;gap:26px;margin:20px 0 6px;align-items:flex-start}
+  .scr{width:236px;flex:0 0 236px}
+  .scr .cap{font-size:12px;font-weight:700;color:var(--acc);letter-spacing:.4px;margin-bottom:6px}
+  .scr .cap span{color:var(--mute);font-weight:400}
+  .ph{border:8px solid #24272c;border-radius:22px;background:var(--paper);height:436px;
+      padding:12px 11px;position:relative;overflow:hidden;display:flex;flex-direction:column}
+  .ph.dark{background:#16181b}
+  .note{font-size:11.5px;color:var(--mute);line-height:1.6;margin-top:8px}
+  .note b{color:var(--ink2)}
+
+  /* ---- wireframe primitives ---- */
+  .imgbox{background:repeating-linear-gradient(45deg,#edf0f3,#edf0f3 6px,#e3e7ec 6px,#e3e7ec 12px);
+    border:1px solid var(--line2);border-radius:5px;display:flex;align-items:center;justify-content:center;
+    color:var(--mute);font-size:11px;text-align:center;line-height:1.5;padding:4px}
+  .t-time{font-size:19px;font-weight:700;text-align:center;margin:11px 0 1px}
+  .t-med{font-size:25px;font-weight:800;text-align:center;letter-spacing:-.5px;margin:0 0 12px}
+  .btn{border-radius:11px;text-align:center;font-weight:800;display:flex;
+       align-items:center;justify-content:center}
+  .b-go{background:var(--go);color:#fff;padding:24px 0;font-size:30px;letter-spacing:8px;text-indent:8px}
+  .b-go.sm{padding:17px 0;font-size:24px}
+  .row2{display:flex;gap:7px;margin-top:8px}
+  .b-2{flex:1;background:#eef1f4;border:1.5px solid var(--line2);color:#333a41;
+       padding:12px 0;font-size:15.5px;font-weight:700;border-radius:10px;text-align:center}
+  .b-2.w{background:#fdf4e7;border-color:#e3c795;color:#8a5a00}
+  .b-mic{margin-top:8px;border:1.5px dashed var(--line2);border-radius:9px;text-align:center;
+         padding:9px 0;font-size:12.5px;color:var(--mute)}
+  .b-call{margin-top:7px;border:1.5px solid var(--line2);background:#f2f4f6;border-radius:9px;
+          text-align:center;padding:9px 0;font-size:12.5px;color:var(--ink2);font-weight:600}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+  .g{background:#eef1f4;border:1.5px solid var(--line2);border-radius:10px;text-align:center;
+     padding:15px 3px;font-size:14px;font-weight:700;line-height:1.35}
+  .g.hot{background:#fbeeed;border-color:#e5b6b1;color:var(--stop)}
+  .skip{text-align:center;color:var(--mute);font-size:12px;margin-top:9px}
+  .center{display:flex;flex-direction:column;align-items:center;justify-content:center;
+          flex:1;text-align:center}
+  .big{font-size:23px;font-weight:800;line-height:1.4}
+  .med{font-size:16px;font-weight:700;line-height:1.5}
+  .sml{font-size:12.5px;color:var(--mute);margin-top:7px;line-height:1.6}
+  .wave{display:flex;gap:3px;align-items:center;justify-content:center;height:48px;margin:12px 0}
+  .wave i{width:5px;background:var(--go-lt);border-radius:3px;display:block}
+  .card{background:#fff;border:1.5px solid var(--line2);border-radius:10px;padding:11px 12px}
+  .flag{display:inline-block;font-size:10.5px;font-weight:700;padding:1px 6px;border-radius:3px;
+        letter-spacing:.3px}
+  .f-go{background:#e7f5ec;color:var(--go-d)}
+  .f-warn{background:#fdf4e7;color:var(--warn)}
+  .f-stop{background:#fbeeed;color:var(--stop)}
+  .f-mute{background:#eef1f4;color:var(--mute)}
+
+  /* annotation markers */
+  .mk{position:absolute;width:19px;height:19px;border-radius:50%;background:var(--stop);color:#fff;
+      font-size:11.5px;font-weight:700;display:flex;align-items:center;justify-content:center;
+      z-index:5;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+  ol.anno{font-size:12px;color:var(--ink2);padding-left:19px;margin:9px 0 0;line-height:1.65}
+  ol.anno li{margin:3px 0}
+  ol.anno li::marker{color:var(--stop);font-weight:700}
+
+  .arrow{flex:0 0 26px;display:flex;align-items:center;justify-content:center;
+         color:var(--line2);font-size:21px;padding-top:190px}
+
+  .box{border-left:3px solid var(--acc);background:var(--acc-bg);padding:12px 16px;
+       margin:18px 0;border-radius:0 5px 5px 0;font-size:13.5px}
+  .box.red{border-color:var(--stop);background:#fbeeed}
+  .box.warn{border-color:var(--warn);background:#fdf7ec}
+  .box .lbl{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;
+            color:var(--acc);margin-bottom:2px}
+  .box.red .lbl{color:var(--stop)}.box.warn .lbl{color:var(--warn)}
+  .box p{margin:4px 0}
+
+  /* desktop / web mock */
+  .web{border:1.5px solid var(--line2);border-radius:8px;overflow:hidden;background:#fff;margin:14px 0}
+  .web .bar{background:#eceff2;border-bottom:1px solid var(--line2);padding:7px 12px;
+            font-size:11.5px;color:var(--mute);display:flex;gap:6px;align-items:center}
+  .web .bar i{width:9px;height:9px;border-radius:50%;background:var(--line2);display:block}
+  .web .body{padding:16px 18px}
+  table{width:100%;border-collapse:collapse;font-size:12.5px}
+  th,td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--line);vertical-align:middle}
+  th{background:var(--panel);font-size:11.5px;color:var(--ink2);font-weight:600}
+  .inp{border:1.5px solid var(--line2);border-radius:5px;padding:4px 7px;background:#fff;
+       font-size:12px;display:inline-block;min-width:70px}
+  .inp.bad{border-color:var(--warn);background:#fdf7ec}
+  .chk{width:15px;height:15px;border:1.5px solid var(--line2);border-radius:3px;display:inline-block;
+       vertical-align:-3px}
+  .chk.on{background:var(--go);border-color:var(--go);position:relative}
+  .chk.on::after{content:"✓";color:#fff;font-size:11px;position:absolute;left:2px;top:-3px}
+  .btnw{display:inline-block;background:var(--go);color:#fff;border-radius:6px;padding:7px 16px;
+        font-size:13px;font-weight:700}
+  .btnw.ghost{background:#fff;color:var(--ink2);border:1.5px solid var(--line2)}
+
+  /* print sheet */
+  .sheet{border:1.5px solid var(--line2);border-radius:6px;background:#fff;padding:20px 22px;
+         max-width:420px;margin:14px 0}
+  .sheet h4{font-size:21px;margin:0 0 3px;text-align:center;font-weight:800}
+  .sheet .who{text-align:center;color:var(--mute);font-size:12.5px;margin-bottom:13px}
+  .sheet table{font-size:15px}
+  .sheet th{font-size:13px}
+  .sheet td{padding:9px;font-weight:700}
+  .sheet .pill{width:34px;height:22px;border-radius:4px;
+    background:repeating-linear-gradient(45deg,#edf0f3,#edf0f3 4px,#e3e7ec 4px,#e3e7ec 8px);
+    border:1px solid var(--line2);display:inline-block}
+
+  .legend{display:flex;gap:18px;flex-wrap:wrap;font-size:12px;color:var(--mute);margin:10px 0 0}
+  .legend b{color:var(--ink2)}
+  footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--line);font-size:12px;color:var(--mute)}
+  @media(max-width:820px){
+    .wrap{padding:30px 16px 60px}
+    .arrow{display:none}
+    .scr{flex:0 0 100%;width:100%;max-width:280px}
+  }
+  @media print{.wrap{padding:0;max-width:none} h2{page-break-after:avoid} .screens{page-break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="ico" viewBox="0 0 192 192">
+    <rect x="3" y="3" width="186" height="186" rx="44" fill="#FFD500"
+          stroke="#141414" stroke-width="6"/>
+    <text x="96" y="82" text-anchor="middle" font-size="76" font-weight="700"
+          fill="#0a0a0a" stroke="#0a0a0a" stroke-width="3.2"
+          font-family="'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif">吃</text>
+    <text x="96" y="163" text-anchor="middle" font-size="76" font-weight="700"
+          fill="#0a0a0a" stroke="#0a0a0a" stroke-width="3.2"
+          font-family="'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif">药</text>
+  </symbol>
+</defs></svg>
+
+<header>
+  <div style="display:flex;gap:16px;align-items:center">
+    <svg width="54" height="54" style="flex:0 0 54px"><use href="#ico"/></svg>
+    <div>
+      <h1 style="margin-bottom:3px">吃药了 · Wireframe</h1>
+      <div class="sub">
+        ChiYaoLe ｜ 老人端 Android APK ｜ 子女端手机网页 ｜ 打印物
+      </div>
+    </div>
+  </div>
+  <div class="sub" style="margin-top:9px">
+    字号以 <b>sp</b> 为单位 · 老人端最小 <b>24sp</b>，主信息 ≥ <b>40sp</b> ·
+    主按钮绿 <b style="font-family:ui-monospace,Menlo,monospace">#0B6B33</b>（白字对比 7.4:1，AAA）·
+    品牌黄 <b style="font-family:ui-monospace,Menlo,monospace">#FFD500</b>
+  </div>
+</header>
+
+<div class="box">
+  <div class="lbl">贯穿全部老人端界面的四条铁律</div>
+  <p><b>① 没有导航。</b>没有底部 Tab、没有返回键逻辑、没有菜单、没有设置、没有登录。任何一屏都是终点。</p>
+  <p><b>② 全部是点击。</b>绝不使用滑动、长按拖拽、双击。（唯一例外：「长按说话」，因为它模仿微信语音，已被学会。）</p>
+  <p><b>③ 不隐藏。</b>不做"点开更多"的渐进披露——藏起来的 UI 对这个人群等于不存在。</p>
+  <p><b>④ 不评分。</b>永远不向老人展示依从率、连续天数、打卡日历。<b>任何计分都会制造说谎的动机。</b></p>
+  <p><b>⑤ 颜色不承载信息。</b>每个色块都必须有文字。
+  红绿色弱约影响 8% 男性，<b>白内障还会把整个画面黄化并降低对比</b>——
+  把界面转成灰度看一眼，如果还能用，才算过关。</p>
+</div>
+
+<div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:14px 0 4px;
+     font-size:12px;color:var(--mute)">
+  <b style="color:var(--ink2);font-size:12.5px">配色</b>
+  <span style="display:inline-flex;align-items:center;gap:6px">
+    <span style="width:52px;height:26px;border-radius:5px;background:var(--go);color:#fff;
+          display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">吃了</span>
+    <code style="font-size:11px">#0B6B33</code> 主按钮 · 白字 <b>7.4:1</b></span>
+  <span style="display:inline-flex;align-items:center;gap:6px">
+    <span style="width:52px;height:26px;border-radius:5px;background:var(--brand);color:#0a0a0a;
+          border:1.5px solid #141414;display:flex;align-items:center;justify-content:center;
+          font-size:11px;font-weight:800">吃药</span>
+    <code style="font-size:11px">#FFD500</code> 品牌 / 图标 · 黑字 <b>15:1</b></span>
+  <span style="color:var(--stop)">
+    ⚠ 原 <code style="font-size:11px">#12A150</code> 仅 3.4:1，已废弃</span>
+</div>
+
+<!-- ================= 0 ================= -->
+<h2><span class="n">0</span>这个 App 平时在哪</h2>
+
+<div class="box red">
+  <div class="lbl">一次设计修正</div>
+  <p>初稿里有一张"待机屏"，默认 App 常驻在屏幕上。<b>这是错的。</b>
+  手机是老人的，不是这个应用的——他要用微信、要接电话、要看照片、要刷视频。
+  一个霸占屏幕的健康 App 会被直接卸载，而且会被子女认为很可疑。</p>
+  <p><b>正确的模型：App 绝大部分时间完全不在屏幕上。</b>它只在三个时刻出现——
+  到点时、有待办时、老人主动打开时。</p>
+</div>
+
+<div class="screens">
+  <div class="scr">
+    <div class="cap">0-1　平时：只是桌面上一个图标</div>
+    <div class="ph" style="background:#dfe6ee;padding:14px 10px">
+      <div class="mk" style="top:150px;left:-9px">1</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:13px 9px">
+        <div style="text-align:center"><div style="height:42px;border-radius:11px;background:#5cb85c"></div>
+          <div style="font-size:10px;margin-top:3px">微信</div></div>
+        <div style="text-align:center"><div style="height:42px;border-radius:11px;background:#4a90d9"></div>
+          <div style="font-size:10px;margin-top:3px">电话</div></div>
+        <div style="text-align:center"><div style="height:42px;border-radius:11px;background:#e8a33d"></div>
+          <div style="font-size:10px;margin-top:3px">相机</div></div>
+        <div style="text-align:center">
+          <svg width="42" height="42" style="display:block;margin:0 auto;
+               box-shadow:0 0 0 3px #fff;border-radius:10px"><use href="#ico"/></svg>
+          <div style="font-size:10px;margin-top:3px;font-weight:700">吃药了</div></div>
+        <div style="text-align:center"><div style="height:42px;border-radius:11px;background:#c94f4f"></div>
+          <div style="font-size:10px;margin-top:3px">今日头条</div></div>
+        <div style="text-align:center"><div style="height:42px;border-radius:11px;background:#8e7cc3"></div>
+          <div style="font-size:10px;margin-top:3px">设置</div></div>
+      </div>
+      <div style="flex:1"></div>
+      <div style="font-size:10.5px;color:#5a6773;text-align:center;line-height:1.6">
+        手机正常使用<br>App 在后台，不占用任何屏幕</div>
+    </div>
+    <ol class="anno">
+      <li><b>亮黄底 + 纯黑「吃药」二字</b>（对比 ≈15:1）。用汉字不用抽象 logo——
+      这个人群认字不认图形；用黄不用蓝——<b>白内障的黄化晶状体大量吸收蓝光</b>。
+      装机时由子女放到<b>第一屏、微信旁边</b>。详见《命名与图标》</li>
+    </ol>
+  </div>
+
+  <div class="arrow">→</div>
+
+  <div class="scr">
+    <div class="cap">0-2　有待办：通知栏，不是全屏</div>
+    <div class="ph" style="background:#dfe6ee;padding:14px 10px">
+      <div class="mk" style="top:22px;left:-9px">1</div>
+      <div class="mk" style="top:112px;left:-9px">2</div>
+      <div class="card" style="padding:9px 10px">
+        <div style="font-size:10px;color:var(--mute);display:flex;align-items:center;gap:4px">
+          <svg width="12" height="12"><use href="#ico"/></svg> 吃药了 · 现在</div>
+        <div style="font-size:14px;font-weight:800;margin-top:2px">早上 8 点的药还没吃</div>
+        <div style="display:flex;gap:6px;margin-top:8px">
+          <div style="flex:1;background:var(--go);color:#fff;border-radius:6px;text-align:center;
+               padding:7px 0;font-size:13px;font-weight:700">吃了</div>
+          <div style="flex:1;background:#eef1f4;border:1px solid var(--line2);border-radius:6px;
+               text-align:center;padding:7px 0;font-size:13px;font-weight:700">打开</div>
+        </div>
+      </div>
+      <div style="height:12px"></div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:9px;opacity:.55">
+        <div style="height:38px;border-radius:10px;background:#5cb85c"></div>
+        <div style="height:38px;border-radius:10px;background:#4a90d9"></div>
+        <div style="height:38px;border-radius:10px;background:#e8a33d"></div>
+      </div>
+      <div style="flex:1"></div>
+      <div style="font-size:10.5px;color:#5a6773;text-align:center">手机仍可正常使用</div>
+    </div>
+    <ol class="anno">
+      <li>待办态活在<b>通知栏和锁屏</b>，<b>不接管屏幕</b>。通知里直接带「吃了」按钮，
+      一步完成，不必进 App</li>
+      <li>底下的手机<b>照常能用</b>。这条是底线</li>
+    </ol>
+  </div>
+
+  <div class="arrow">→</div>
+
+  <div class="scr">
+    <div class="cap">0-3　主动打开：App 首页</div>
+    <div class="ph">
+      <div class="mk" style="top:130px;left:-9px">1</div>
+      <div class="mk" style="top:322px;left:-9px">2</div>
+      <div class="center">
+        <div class="med" style="color:var(--mute)">现在没有要吃的药</div>
+        <div style="height:18px"></div>
+        <div class="sml" style="margin:0">下一次</div>
+        <div class="big">中午 12 点</div>
+        <div class="big" style="font-size:19px">降糖药 一片</div>
+      </div>
+      <div class="b-mic" style="padding:14px 0;font-size:15px">长按说话</div>
+      <div class="b-call" style="padding:12px 0;font-size:14px;font-weight:700">给医生看</div>
+    </div>
+    <ol class="anno">
+      <li>只说下一次是什么。<b>不显示今日进度条、不显示已完成几次</b>——那是计分</li>
+      <li><b>「给医生看」</b>：点一下全屏显示<b>近 3 次指标对比 + 当前用药清单</b>，
+      直接把手机递给医生。老人复诊时医生问"上次单子呢"翻不出来，是真实且高频的场面——
+      <b>而这个入口零准备、永远可用</b>，不依赖子女提前打印或转发</li>
+      <li><b>这里没有拨号按钮</b>——他在桌面本来就能打电话，放这儿只会抢注意力。
+      拨号只在<b>真正需要它的两处</b>出现（B3、C3）。
+      按返回/Home 键随时能退出，<b>绝不留人</b></li>
+    </ol>
+  </div>
+</div>
+
+<h3>什么时候才允许接管全屏</h3>
+<table>
+  <tr><th style="width:150px">时刻</th><th style="width:130px">表现形式</th><th>规则</th></tr>
+  <tr><td><b>到点提醒</b></td><td><span class="flag f-stop">全屏接管</span></td>
+    <td>唯一允许全屏的时刻，语义等同闹钟／来电。<b>一次点击后立即完全退出</b>，
+    回到老人原来在做的事</td></tr>
+  <tr><td>响铃结束仍未确认</td><td><span class="flag f-warn">通知栏常驻</span></td>
+    <td>降级为通知，<b>不再占屏</b></td></tr>
+  <tr><td>子女回话了</td><td><span class="flag f-warn">通知 + 轻响一声</span></td>
+    <td>不接管屏幕，点开才播放</td></tr>
+  <tr><td>其余全部时间</td><td><span class="flag f-mute">完全不出现</span></td><td>—</td></tr>
+</table>
+
+<div class="box warn">
+  <div class="lbl">三条必须处理的例外</div>
+  <p><b>① 通话中不接管。</b>老人正在打电话（尤其是和子女视频）时到点，
+  <b>推迟到通话结束后再响</b>。打断一次通话，产品就会被关掉。</p>
+  <p><b>② 永远不劫持返回键。</b>任何一屏按返回／Home 都能立刻离开。
+  留人的 App 在这个人群里会引发恐慌——"这个东西关不掉了"。</p>
+  <p><b>③ 不申请无关权限。</b>不要通讯录、不要位置、不要相册。
+  权限弹窗越多，子女越怀疑这是骗老人的软件。</p>
+</div>
+
+<!-- ================= A ================= -->
+<h2><span class="n">A</span>老人端主流程：到点吃药</h2>
+<p class="lead">这是全产品被使用最多的一条路径——每天 2–4 次。</p>
+
+<div class="screens">
+
+  <!-- A1 -->
+  <div class="scr">
+    <div class="cap">A1　到点提醒 <span>· 核心屏 · 唯一允许全屏的时刻</span></div>
+    <div class="ph">
+      <div class="mk" style="top:14px;left:-9px">1</div>
+      <div class="mk" style="top:196px;left:-9px">2</div>
+      <div class="mk" style="top:290px;left:-9px">3</div>
+      <div class="mk" style="top:352px;left:-9px">4</div>
+      <div class="imgbox" style="height:118px">［ 药盒实拍照片 ］<br>子女拍的那一张</div>
+      <div class="t-time">早上 8 点</div>
+      <div class="t-med">降压药 一片</div>
+      <div class="btn b-go">吃了</div>
+      <div class="row2">
+        <div class="b-2">等会儿吃</div>
+        <div class="b-2 w">这次不吃</div>
+      </div>
+      <div class="b-mic">长按说话</div>
+    </div>
+    <ol class="anno">
+      <li>自动亮屏、全屏、<b>绕过锁屏</b>；同时语音播报「…白色小盒子那个，一片」。
+      <b>通话中则推迟到通话结束</b></li>
+      <li>主按钮 <b>40sp / 占屏 ~28%</b>，绿色。<b>不需要瞄准</b></li>
+      <li>次级两个：<b>灰底、约主按钮 55% 高度</b>。用尺寸而非隐藏来建立层级</li>
+      <li>「这次」二字刻意保留：强调只是这一顿，<b>不是停药</b></li>
+    </ol>
+  </div>
+
+  <div class="arrow">→</div>
+
+  <!-- A3 -->
+  <div class="scr">
+    <div class="cap">A2　按下「吃了」</div>
+    <div class="ph">
+      <div class="mk" style="top:150px;left:-9px">1</div>
+      <div class="center">
+        <div style="font-size:52px;color:var(--go);line-height:1">✓</div>
+        <div class="big" style="margin-top:14px">知道了</div>
+        <div class="sml">2 秒后自动熄屏</div>
+      </div>
+    </div>
+    <ol class="anno">
+      <li><b>不表扬</b>。不说"很好""坚持得不错"——
+      表扬会把"不按"变成失败，从而制造随手按的动机</li>
+    </ol>
+  </div>
+
+  <div class="arrow">→</div>
+
+  <!-- A4 -->
+  <div class="scr">
+    <div class="cap">A3　按下「等会儿吃」</div>
+    <div class="ph">
+      <div class="mk" style="top:150px;left:-9px">1</div>
+      <div class="mk" style="top:250px;left:-9px">2</div>
+      <div class="center">
+        <div class="big">行，等会儿再叫你</div>
+        <div style="height:10px"></div>
+        <div class="med" style="color:var(--mute)">半小时后</div>
+        <div class="sml" style="max-width:170px">
+          盒子上写的是<b>饭前吃</b><br>
+          <span style="font-size:11px">（原样转录，不作任何建议）</span>
+        </div>
+      </div>
+    </div>
+    <ol class="anno">
+      <li>固定 30 分钟，<b>不给时间选择器</b>——选择器对这个人群是灾难</li>
+      <li>若药盒上印有服用条件，<b>原文转录</b>显示。这是"转录"，不是"建议"（见方案 §04-⑨）。
+      <b>连按 3 次不再顺延，改为通知子女</b></li>
+    </ol>
+  </div>
+
+</div>
+
+<h3>A4　按下「这次不吃」→ 追问一屏</h3>
+<div class="screens">
+  <div class="scr">
+    <div class="cap">A4　为什么不吃 <span>· 可跳过</span></div>
+    <div class="ph">
+      <div class="mk" style="top:14px;left:-9px">1</div>
+      <div class="mk" style="top:210px;left:-9px">2</div>
+      <div class="mk" style="top:372px;left:-9px">3</div>
+      <div style="font-size:17px;font-weight:700;text-align:center;margin:4px 0 1px">为什么不吃？</div>
+      <div style="text-align:center;font-size:12px;color:var(--mute);margin-bottom:11px">不想说也可以</div>
+      <div class="grid2">
+        <div class="g">我不在家</div>
+        <div class="g">药吃完了</div>
+        <div class="g hot">今天不舒服</div>
+        <div class="g hot">医生说停了</div>
+      </div>
+      <div class="skip">不说了 ›</div>
+      <div style="flex:1"></div>
+      <div style="font-size:11px;color:var(--mute);border-top:1px dashed var(--line);padding-top:9px">
+        每个选项触发<b>完全不同</b>的下游动作 →
+      </div>
+    </div>
+    <ol class="anno">
+      <li><b>不做任何劝阻</b>、不显示后果警告。劝阻会让人下次直接按"吃了"</li>
+      <li>四个选项各占 <b>50% 宽 × 60px 高</b>，红色两个是高紧急度</li>
+      <li>可跳过。但这是<b>全产品信息密度最高的一次点击</b></li>
+    </ol>
+  </div>
+
+  <div class="scr" style="flex:1 1 380px;width:auto">
+    <div class="cap">四个选项的下游动作</div>
+    <table style="margin-top:2px">
+      <tr><th style="width:92px">选项</th><th style="width:74px">紧急度</th><th>触发</th></tr>
+      <tr><td><b>我不在家</b></td><td><span class="flag f-mute">低</span></td>
+        <td>仅记录。<b>但这是最重要的一个选项</b>——它把原本会变成假"吃了"的行为，转成了干净数据</td></tr>
+      <tr><td><b>药吃完了</b></td><td><span class="flag f-warn">中</span></td>
+        <td>立即通知子女<b>「该买药了」</b>。老人药吃完不主动说，是常见且完全可预防的断药原因</td></tr>
+      <tr><td><b>今天不舒服</b></td><td><span class="flag f-stop">最高</span></td>
+        <td>归为 <code>SYMPTOM</code>：<b>立即推送子女 + 原话原声</b>，15 分钟无响应转第二联系人</td></tr>
+      <tr><td><b>医生说停了</b></td><td><span class="flag f-stop">高</span></td>
+        <td>子女核实 + <b>标记方案可能已过期 → 请求重拍药盒</b></td></tr>
+    </table>
+    <div class="box warn" style="margin-top:14px">
+      <div class="lbl">这一屏为什么值得多一次点击</div>
+      <p>它是唯一一处<b>老人主动提供信息</b>的地方，而这四条信息在别处都拿不到——
+      子女不会知道药吃完了，医生不会知道老人自己停了药。
+      <b>用一次点击换四种完全不同的干预，是全产品性价比最高的交互。</b></p>
+    </div>
+  </div>
+</div>
+
+<!-- ================= B ================= -->
+<h2><span class="n">B</span>老人端：未确认与待办态</h2>
+<p class="lead">和闹钟最重要的一处不同——<b>闹钟被关掉职责就结束了，用药提醒不是。</b></p>
+
+<div class="screens">
+  <div class="scr">
+    <div class="cap">B1　响铃结束、仍未确认</div>
+    <div class="ph">
+      <div class="mk" style="top:60px;left:-9px">1</div>
+      <div class="mk" style="top:300px;left:-9px">2</div>
+      <div style="height:14px"></div>
+      <div class="card" style="display:flex;gap:9px;align-items:center">
+        <div class="imgbox" style="width:52px;height:52px;flex:0 0 52px;font-size:9px">药盒图</div>
+        <div>
+          <div style="font-size:15px;font-weight:800">早上 8 点的药</div>
+          <div style="font-size:13px;color:var(--stop);font-weight:700">还没吃</div>
+        </div>
+      </div>
+      <div style="height:14px"></div>
+      <div class="btn b-go sm">吃了</div>
+      <div class="row2"><div class="b-2" style="font-size:14px">等会儿吃</div>
+        <div class="b-2 w" style="font-size:14px">这次不吃</div></div>
+      <div style="flex:1"></div>
+      <div class="sml" style="text-align:center">下一次　中午 12 点</div>
+    </div>
+    <ol class="anno">
+      <li>响铃结束后<b>常驻卡片</b>（屏幕 + 通知栏），直到被处理或被下一次覆盖。
+      <b>通知会自己消失，这个不会</b></li>
+      <li>三个按钮保持可用，只是缩小</li>
+    </ol>
+  </div>
+
+  <div class="arrow">→</div>
+
+  <div class="scr">
+    <div class="cap">B2　30 分钟未确认 <span>· 已升级</span></div>
+    <div class="ph">
+      <div class="mk" style="top:150px;left:-9px">1</div>
+      <div class="center">
+        <div class="med">早上 8 点的药还没吃</div>
+        <div style="height:14px"></div>
+        <div class="card" style="width:100%;background:#f6f8fa">
+          <div style="font-size:14px;font-weight:700">已经告诉你女儿了</div>
+          <div class="sml" style="margin-top:2px">她一会儿可能给你打电话</div>
+        </div>
+      </div>
+      <div class="btn b-go sm">吃了</div>
+    </div>
+    <ol class="anno">
+      <li><b>投递确认之后才说"已经告诉"</b>。入队时只能说"我这就去问"——
+      <b>说出口的承诺必须是真的</b>（方案 §04-⑦）</li>
+      <li><b>这里也没有拨号按钮</b>：既然已经通知到女儿了，再提"打电话"是多余的噪音</li>
+    </ol>
+  </div>
+
+  <div class="arrow">→</div>
+
+  <div class="scr">
+    <div class="cap">B3　联系不上子女</div>
+    <div class="ph">
+      <div class="mk" style="top:140px;left:-9px">1</div>
+      <div class="center">
+        <div class="med" style="color:var(--warn)">我没联系上小芳</div>
+        <div class="sml">你可以自己给她打个电话</div>
+      </div>
+      <div class="btn b-go" style="background:var(--stop);font-size:24px;letter-spacing:4px;
+           text-indent:4px;padding:30px 0">打电话</div>
+      <div style="text-align:center;font-size:15px;font-weight:700;margin-top:8px">女儿　小芳</div>
+    </div>
+    <ol class="anno">
+      <li>重试耗尽后<b>诚实降级</b> + 满屏拨号按钮。
+      <b>最终兜底通道是电话，它永远能用</b>——<b>这一屏是承重的，不可删</b>：
+      没有它，「我联系不上她」之后就没有出口了</li>
+    </ol>
+  </div>
+</div>
+
+<!-- ================= C ================= -->
+<h2><span class="n">C</span>老人端：语音问答与升级闭环</h2>
+<p class="lead">「长按说话」的三种结局：能答、不能答（转子女）、子女回话了。</p>
+
+<div class="screens">
+  <div class="scr">
+    <div class="cap">C1　录音中</div>
+    <div class="ph dark">
+      <div class="center" style="color:#fff">
+        <div style="font-size:19px;font-weight:700">我在听…</div>
+        <div class="wave">
+          <i style="height:16px"></i><i style="height:32px"></i><i style="height:46px"></i>
+          <i style="height:26px"></i><i style="height:40px"></i><i style="height:20px"></i>
+          <i style="height:34px"></i><i style="height:14px"></i>
+        </div>
+        <div style="font-size:13px;color:#8c949c">松手就好</div>
+      </div>
+    </div>
+    <ol class="anno">
+      <li>模仿微信语音的长按交互——<b>这是唯一被这个人群普遍学会的手势</b></li>
+    </ol>
+  </div>
+
+  <div class="arrow">→</div>
+
+  <div class="scr">
+    <div class="cap">C2　能回答 <span>· 6 类固定意图</span></div>
+    <div class="ph">
+      <div class="mk" style="top:22px;left:-9px">1</div>
+      <div class="mk" style="top:240px;left:-9px">2</div>
+      <div style="background:var(--panel);border-radius:8px;padding:8px 10px;font-size:12px;color:var(--mute)">
+        你问：<b style="color:var(--ink2)">「我今天吃药了没」</b></div>
+      <div class="center">
+        <div class="big">今天两次都吃了</div>
+        <div style="height:8px"></div>
+        <div class="med" style="color:var(--mute);font-size:15px">早上 8 点　中午 12 点</div>
+        <div class="sml">🔊 正在念给你听</div>
+      </div>
+      <div class="b-mic" style="padding:12px 0;font-size:13.5px">再问一句</div>
+    </div>
+    <ol class="anno">
+      <li>先显示<b>听到的原话</b>，让老人能发现 ASR 转错了</li>
+      <li>答案同时<b>显示 + 朗读</b>。这个问题能免费回答，
+      因为按钮点击数据本来就有——<b>零输入的记忆</b></li>
+    </ol>
+  </div>
+
+  <div class="arrow">→</div>
+
+  <div class="scr">
+    <div class="cap">C3　不能回答 <span>· 拒答 + 升级</span></div>
+    <div class="ph">
+      <div class="mk" style="top:22px;left:-9px">1</div>
+      <div class="mk" style="top:180px;left:-9px">2</div>
+      <div style="background:var(--panel);border-radius:8px;padding:8px 10px;font-size:12px;color:var(--mute)">
+        你问：<b style="color:var(--ink2)">「这个药能不能少吃一片」</b></div>
+      <div class="center">
+        <div class="med" style="max-width:180px">这个我不能替医生决定</div>
+        <div style="height:12px"></div>
+        <div class="card" style="width:100%;background:#f6f8fa">
+          <div style="font-size:13.5px;font-weight:700">我这就去问小芳</div>
+          <div class="sml" style="margin-top:1px">发出去了会告诉你</div>
+        </div>
+      </div>
+      <div class="b-call">给小芳打电话</div>
+    </div>
+    <ol class="anno">
+      <li>任何触及<b>改剂量 / 停药 / 症状</b>的问题，一律拒答并转人——
+      这是红线，也是合规护身符</li>
+      <li>注意时态：<b>「我这就去问」</b>（未投递）而非「已经告诉」</li>
+    </ol>
+  </div>
+
+  <div class="arrow">→</div>
+
+  <div class="scr">
+    <div class="cap">C4　子女回话了 <span>· 闭环</span></div>
+    <div class="ph">
+      <div class="mk" style="top:130px;left:-9px">1</div>
+      <div class="center">
+        <div class="med" style="color:var(--acc)">你女儿回话了</div>
+        <div style="height:12px"></div>
+        <div class="card" style="width:100%">
+          <div style="display:flex;align-items:center;gap:9px">
+            <div style="width:34px;height:34px;border-radius:50%;background:var(--go);color:#fff;
+                 display:flex;align-items:center;justify-content:center;font-size:15px">▶</div>
+            <div style="font-size:13.5px;font-weight:700">小芳的语音　12 秒</div>
+          </div>
+          <div class="sml" style="margin-top:7px;padding-top:7px;border-top:1px dashed var(--line)">
+            「妈，那个药不能减，我明天陪你去问医生」</div>
+        </div>
+      </div>
+      <div class="b-mic" style="padding:12px 0;font-size:13.5px">回她一句</div>
+    </div>
+    <ol class="anno">
+      <li><b>播放子女原声</b>，不是文字转述。
+      这个闭环是整个功能的价值所在——没有下文，老人两周内就不再开口问了</li>
+    </ol>
+  </div>
+</div>
+
+<div class="box red">
+  <div class="lbl">C3 → C4 才是产品，C2 只是功能</div>
+  <p>这条链路里最有价值的部分<b>不是 AI</b>，是把老人的原话准确送到子女手里、再把回答送回来。
+  AI 只在做分诊。一个 78 岁老人和一个在深圳上班的女儿，
+  现在的沟通方式是每周一次十分钟电话、老人报喜不报忧——<b>这个异步语音中转比任何模型能力都值钱。</b></p>
+</div>
+
+<!-- ================= D ================= -->
+<h2><span class="n">D</span>子女端（<b>手机网页</b>，微信里直接打开）</h2>
+<p class="lead">正常成年人使用，可以有正常的信息密度。用 URL 里的随机 token 进入，无需注册登录。</p>
+
+<div class="box red">
+  <div class="lbl">先说清楚：子女端是「手机上的网页」，不是电脑网页</div>
+  <p>子女在微信里收到一条链接 → 点开 → <b>就在手机上拍照</b>。
+  「Web」指的是<b>交付形态</b>（网页，零安装），不是<b>使用设备</b>。
+  拍照当然是手机拍——但用<b>网页调起手机相机</b>，而不是让子女再装一个 App。</p>
+  <p><b>为什么子女端也不做 App？</b>个人主体同样上不了应用商店（和老人端一个问题），
+  而让子女也侧载 APK 会在<b>最需要说服他的那一刻</b>增加摩擦。
+  微信里点一个链接，是中国最自然、阻力最小的路径——<b>冷启动阶段任何摩擦都是致命的。</b></p>
+</div>
+
+<div class="box warn">
+  <div class="lbl">一个必须面对的技术现实：微信浏览器里能做什么相机</div>
+  <table style="margin:8px 0 4px">
+    <tr><th style="width:190px">方案</th><th style="width:96px">POC 可用</th><th>说明</th></tr>
+    <tr><td><code>&lt;input capture&gt;</code><br>调起系统相机</td>
+      <td><span class="flag f-go">✓ 可靠</span></td>
+      <td>零依赖，安卓/iOS 微信内均稳定。<b>代价：不能画自定义取景框、不能做实时提示</b></td></tr>
+    <tr><td><code>getUserMedia</code><br>网页内实时预览</td>
+      <td><span class="flag f-warn">不稳</span></td>
+      <td>能画取景框和实时反馈，但<b>在微信内置浏览器里支持不稳定</b>，
+        iOS 尤其。POC 不能押在这上面</td></tr>
+    <tr><td>微信 JS-SDK<br><code>wx.chooseImage</code></td>
+      <td><span class="flag f-stop">✕ 拿不到</span></td>
+      <td>体验最好，但需<b>已认证的服务号 + JS 安全域名配置</b> →
+        <b>个人主体拿不到</b>（同 §01 的资质约束）</td></tr>
+  </table>
+  <p style="margin-top:8px"><b>所以 POC 的方案是：调系统相机拍 → 上传 → 服务端 VLM 检查 → 有问题就说"重拍一张"。</b>
+  把<b>实时反馈改成拍后反馈</b>，多一次往返，但零依赖、100% 可用。</p>
+  <p><b>而且这样反而更好</b>：浏览器端的模糊检测本来就不准；
+  而"信息够不够"这个判断<b>无论如何都必须由服务端 VLM 来做</b>——
+  统一成"拍完再说"，逻辑更一致。实时取景留到 v2 做原生 App 时再上。</p>
+</div>
+
+<h3>D1　拍照采集 —— 冷启动，整个产品的第一道关</h3>
+<p class="lead">这一步不成，后面全部不存在。目标：<b>子女 5 分钟内完成，且不需要读任何说明。</b>
+所以设计原则是——<b>不给前置说明，让 AI 边看边提要求。</b></p>
+
+<div class="screens">
+  <div class="scr">
+    <div class="cap">D1a　入口 <span>· 打开链接第一屏</span></div>
+    <div class="ph">
+      <div class="mk" style="top:22px;left:-9px">1</div>
+      <div class="mk" style="top:300px;left:-9px">2</div>
+      <div style="font-size:17px;font-weight:800;margin:4px 0 3px">给妈妈建一份用药表</div>
+      <div style="font-size:12px;color:var(--mute);margin-bottom:14px">
+        把家里的药盒拍下来就行，大概 5 分钟</div>
+      <div class="card" style="margin-bottom:8px;display:flex;gap:10px;align-items:center">
+        <div class="imgbox" style="width:40px;height:40px;flex:0 0 40px;font-size:9px">盒</div>
+        <div><div style="font-size:14px;font-weight:700">拍药盒</div>
+          <div style="font-size:11px;color:var(--mute)">最常见，先拍这个</div></div>
+      </div>
+      <div class="card" style="margin-bottom:8px;display:flex;gap:10px;align-items:center">
+        <div class="imgbox" style="width:40px;height:40px;flex:0 0 40px;font-size:9px">袋</div>
+        <div><div style="font-size:14px;font-weight:700">拍药袋标签</div>
+          <div style="font-size:11px;color:var(--mute)">医院配的药，<b>标签上有医生的用法</b></div></div>
+      </div>
+      <div class="card" style="margin-bottom:8px;display:flex;gap:10px;align-items:center">
+        <div class="imgbox" style="width:40px;height:40px;flex:0 0 40px;font-size:9px">单</div>
+        <div><div style="font-size:14px;font-weight:700">拍化验单 / 出院小结</div>
+          <div style="font-size:11px;color:var(--mute)">可以之后再补</div></div>
+      </div>
+      <div style="flex:1"></div>
+      <div style="font-size:11px;color:var(--mute);text-align:center;line-height:1.6">
+        照片只你和妈妈能看到<br>不上传通讯录、不读相册</div>
+    </div>
+    <ol class="anno">
+      <li><b>药袋标签单列一项</b>——医院配药常没有零售盒，
+      而药师贴的标签上恰恰有<b>医生实际开的用法</b>，比说明书更准</li>
+      <li>第一屏就讲清隐私边界。子女的疑虑是冷启动最大阻力</li>
+    </ol>
+  </div>
+
+  <div class="arrow">→</div>
+
+  <div class="scr">
+    <div class="cap">D1b　拍摄页 <span>· 网页，非原生相机</span></div>
+    <div class="ph">
+      <div class="mk" style="top:22px;left:-9px">1</div>
+      <div class="mk" style="top:196px;left:-9px">2</div>
+      <div class="mk" style="top:330px;left:-9px">3</div>
+      <div style="font-size:14px;font-weight:800;margin:2px 0 2px">拍药盒</div>
+      <div style="font-size:11.5px;color:var(--mute);margin-bottom:10px">
+        整个盒子放进画面，字朝上</div>
+      <div style="display:flex;gap:6px;margin-bottom:10px">
+        <div class="imgbox" style="width:52px;height:52px;flex:0 0 52px;font-size:9px">✓</div>
+        <div class="imgbox" style="width:52px;height:52px;flex:0 0 52px;font-size:9px">✓</div>
+        <div class="imgbox" style="width:52px;height:52px;flex:0 0 52px;font-size:9px">✓</div>
+      </div>
+      <div style="border:2px dashed var(--line2);border-radius:10px;padding:22px 10px;
+           text-align:center;background:var(--panel)">
+        <div style="font-size:30px;line-height:1;color:var(--mute)">＋</div>
+        <div style="font-size:15px;font-weight:800;margin-top:7px">拍下一盒</div>
+        <div style="font-size:11px;color:var(--mute);margin-top:2px">点这里调起相机</div>
+      </div>
+      <div style="flex:1"></div>
+      <div class="btn" style="background:var(--go);color:#fff;padding:13px 0;font-size:15px">
+        3 盒拍完了，下一步</div>
+    </div>
+    <ol class="anno">
+      <li>这是<b>网页</b>，不是自定义相机。点「＋」用
+      <code>&lt;input capture&gt;</code> 调起<b>系统相机</b>，拍完自动回到这一页</li>
+      <li>已拍缩略图横排累加。<b>连续拍多盒，不逐盒打断</b></li>
+      <li>取景指引只能写成<b>页面上的一行字</b>，不能画在相机画面里——这是 WebView 的限制</li>
+    </ol>
+  </div>
+
+  <div class="arrow">→</div>
+
+  <div class="scr">
+    <div class="cap">D1c　拍后检查 <span>· 替代实时反馈</span></div>
+    <div class="ph">
+      <div class="mk" style="top:22px;left:-9px">1</div>
+      <div class="mk" style="top:296px;left:-9px">2</div>
+      <div class="imgbox" style="height:118px;filter:blur(1.4px)">［ 刚拍的这张 ］<br>有点糊</div>
+      <div style="height:11px"></div>
+      <div class="card" style="background:#fdf7ec;border-color:#e3c795">
+        <div style="font-size:13.5px;font-weight:800;color:var(--warn)">这张有点糊，字看不清</div>
+        <div style="font-size:12.5px;margin-top:4px;line-height:1.6">
+          手扶稳一点，等画面清楚了再按。<br>或者<b>把盒子放桌上再拍</b>。</div>
+      </div>
+      <div style="flex:1"></div>
+      <div style="display:flex;gap:7px">
+        <div class="btn" style="flex:1;background:var(--go);color:#fff;padding:12px 0;font-size:14.5px">
+          重拍这张</div>
+        <div class="btn" style="flex:0 0 76px;background:#eef1f4;border:1.5px solid var(--line2);
+             color:#333a41;padding:12px 0;font-size:13px">先留着</div>
+      </div>
+    </div>
+    <ol class="anno">
+      <li>上传后由<b>服务端</b>判断（糊 / 反光 / 太远 / 不是药盒），
+      而不是浏览器实时判断——<b>更准，且不依赖 getUserMedia</b></li>
+      <li>永远给「先留着」的出路。<b>不要在冷启动阶段卡人</b>，
+      模糊也可能仍然读得出来</li>
+    </ol>
+  </div>
+
+  <div class="arrow">→</div>
+
+  <div class="scr">
+    <div class="cap">D1d　AI 发现信息不全 <span>· 关键设计</span></div>
+    <div class="ph">
+      <div class="mk" style="top:22px;left:-9px">1</div>
+      <div class="mk" style="top:250px;left:-9px">2</div>
+      <div class="imgbox" style="height:96px">［ 刚拍的那张 ］<br>络活喜 正面</div>
+      <div style="height:11px"></div>
+      <div class="card" style="background:#fdf7ec;border-color:#e3c795">
+        <div style="font-size:13.5px;font-weight:800;color:var(--warn)">还差「怎么吃」</div>
+        <div style="font-size:12.5px;margin-top:5px;line-height:1.6">
+          这一面只有药名。<br>
+          请把盒子<b>翻到写着「用法用量」那一面</b>再拍一张。</div>
+      </div>
+      <div style="height:9px"></div>
+      <div class="imgbox" style="height:66px;font-size:10px">
+        ［ 示意图：盒子侧面，<br>用法用量那一栏被框出来 ］</div>
+      <div style="flex:1"></div>
+      <div style="display:flex;gap:7px">
+        <div class="btn" style="flex:1;background:var(--go);color:#fff;padding:11px 0;font-size:14px">
+          再拍一张</div>
+        <div class="btn" style="flex:0 0 84px;background:#eef1f4;border:1.5px solid var(--line2);
+             color:#333a41;padding:11px 0;font-size:13px">我自己填</div>
+      </div>
+    </div>
+    <ol class="anno">
+      <li><b>不做前置说明书。</b>没人会读"请拍摄包含用法用量的一面"。
+      改成 <b>AI 看完再提具体要求</b>——要求越具体，完成率越高</li>
+      <li>永远留一条<b>手动填写</b>的出路。盒子磨损、拆零分装时，拍不出来</li>
+    </ol>
+  </div>
+
+  <div class="arrow">→</div>
+
+  <div class="scr">
+    <div class="cap">D1e　拍完清单 <span>· 进入校对前</span></div>
+    <div class="ph">
+      <div class="mk" style="top:22px;left:-9px">1</div>
+      <div class="mk" style="top:300px;left:-9px">2</div>
+      <div style="font-size:15px;font-weight:800;margin:2px 0 9px">一共 5 盒药</div>
+      <div class="card" style="padding:8px 9px;margin-bottom:6px;display:flex;gap:8px;align-items:center">
+        <div class="imgbox" style="width:34px;height:34px;flex:0 0 34px;font-size:8px">图</div>
+        <div style="flex:1"><div style="font-size:12.5px;font-weight:700">络活喜</div>
+          <div style="font-size:10.5px;color:var(--mute)">2 张 · 已读到用法</div></div>
+        <span class="flag f-go">好了</span>
+      </div>
+      <div class="card" style="padding:8px 9px;margin-bottom:6px;display:flex;gap:8px;align-items:center">
+        <div class="imgbox" style="width:34px;height:34px;flex:0 0 34px;font-size:8px">图</div>
+        <div style="flex:1"><div style="font-size:12.5px;font-weight:700">二甲双胍</div>
+          <div style="font-size:10.5px;color:var(--warn)">缺用法用量</div></div>
+        <span class="flag f-warn">补一张</span>
+      </div>
+      <div class="card" style="padding:8px 9px;margin-bottom:6px;display:flex;gap:8px;align-items:center">
+        <div class="imgbox" style="width:34px;height:34px;flex:0 0 34px;font-size:8px">图</div>
+        <div style="flex:1"><div style="font-size:12.5px;font-weight:700">阿托伐他汀</div>
+          <div style="font-size:10.5px;color:var(--mute)">1 张</div></div>
+        <span class="flag f-go">好了</span>
+      </div>
+      <div style="font-size:11px;color:var(--mute);text-align:center;margin:4px 0">… 还有 2 盒</div>
+      <div style="flex:1"></div>
+      <div class="btn" style="background:var(--go);color:#fff;padding:13px 0;font-size:15px">
+        下一步：核对内容</div>
+    </div>
+    <ol class="anno">
+      <li>状态只有两种：<b>「好了」/「补一张」</b>。不显示置信度百分比之类的技术指标</li>
+      <li>缺料也<b>允许直接进入下一步</b>——不要在冷启动阶段卡人</li>
+    </ol>
+  </div>
+</div>
+
+<h3>D1f　化验单拍照 —— 提示词不同，失败模式也不同</h3>
+<div class="screens">
+  <div class="scr">
+    <div class="cap">D1f　化验单 <span>· 多页 · 热敏纸</span></div>
+    <div class="ph">
+      <div class="mk" style="top:22px;left:-9px">1</div>
+      <div class="mk" style="top:150px;left:-9px">2</div>
+      <div class="mk" style="top:300px;left:-9px">3</div>
+      <div style="font-size:14px;font-weight:800;margin:2px 0 2px">拍化验单</div>
+      <div style="font-size:11.5px;color:var(--mute);margin-bottom:9px;line-height:1.6">
+        竖着拿手机，四个角都要拍进去<br>
+        <b>纸压平一点，别在灯正下方拍</b></div>
+      <div style="display:flex;gap:6px;margin-bottom:9px">
+        <div class="imgbox" style="width:40px;height:54px;flex:0 0 40px;font-size:9px">第1页</div>
+        <div class="imgbox" style="width:40px;height:54px;flex:0 0 40px;font-size:9px">第2页</div>
+      </div>
+      <div class="card" style="background:#fdf7ec;border-color:#e3c795;padding:9px 10px">
+        <div style="font-size:12.5px;font-weight:800;color:var(--warn)">第 2 页有反光，挡住了 3 行</div>
+        <div style="font-size:11.5px;margin-top:3px">换个角度，或把纸挪出灯光直射</div>
+      </div>
+      <div style="height:9px"></div>
+      <div style="border:2px dashed var(--line2);border-radius:10px;padding:14px 10px;
+           text-align:center;background:var(--panel);font-size:14px;font-weight:700">
+        ＋ 还有一页</div>
+      <div style="flex:1"></div>
+      <div class="btn" style="background:var(--go);color:#fff;padding:12px 0;font-size:14.5px">
+        拍完了</div>
+    </div>
+    <ol class="anno">
+      <li>提示词和药盒<b>完全不同</b>：热敏纸的<b>反光与卷曲</b>是这里最主要的失败原因</li>
+      <li>反馈能<b>具体到"第 2 页挡住了 3 行"</b>——因为是服务端 VLM 在读，
+      它知道表格缺了几行。这是拍后反馈优于实时反馈的地方</li>
+      <li>默认<b>多页</b>，生化全套常有 2–3 张</li>
+    </ol>
+  </div>
+
+  <div class="scr" style="flex:1 1 380px;width:auto">
+    <div class="cap">拍照环节的四条设计原则</div>
+    <table style="margin-top:2px">
+      <tr><th style="width:118px">原则</th><th>为什么</th></tr>
+      <tr><td><b>不写使用说明</b></td>
+        <td>没人读。改成 <b>AI 看完照片后提具体要求</b>——
+        「请翻到写着用法用量那一面」比「请拍摄完整包装」有效一个量级</td></tr>
+      <tr><td><b>反馈在拍之后<br>不在取景时</b></td>
+        <td>微信浏览器里 <code>getUserMedia</code> 不稳定，画不了实时取景框。
+        但服务端反馈<b>反而更具体</b>——能说出"第 2 页挡住了 3 行"，
+        而不只是"太糊了"</td></tr>
+      <tr><td><b>批量拍，统一校对</b></td>
+        <td>逐盒确认会让 5 分钟变成 20 分钟。<b>先全拍完，再一次性核对</b></td></tr>
+      <tr><td><b>永远留手动出路</b></td>
+        <td>拆零分装、盒子磨损、进口药——<b>总有拍不出来的</b>。
+        没有手动填写，这些用户直接流失</td></tr>
+      <tr><td><b>原图永久保留</b></td>
+        <td>VLM 会看错且看错时很自信。<b>原图是唯一的仲裁者</b>，
+        且模型升级后可重跑历史数据</td></tr>
+    </table>
+    <div class="box red" style="margin-top:14px">
+      <div class="lbl">这一屏的转化率决定整个产品</div>
+      <p>第 11 天上门时要计时：<b>从打开链接到拍完，实际用了几分钟？中途放弃了吗？</b>
+      如果子女在这一步就退出，后面所有设计——按钮、语音、事实层——<b>一个都不会发生。</b></p>
+      <p><b>所以这 5 分钟必须当场兑现。</b>初稿指望「打印贴冰箱」，
+      但多数家庭没有打印机——现在改由 <b>D3 的「试听」</b>承担（听到那句话的情绪冲击），
+      加上 <b>大字用药表图片发家庭群 / 设成锁屏</b>。<b>两者都不需要任何硬件。</b></p>
+    </div>
+  </div>
+</div>
+
+<h3>D2　逐条确认　<span style="color:var(--stop);font-size:13px">← 红线所在</span></h3>
+<div class="web">
+  <div class="bar"><i></i><i></i><i></i><span style="margin-left:6px">核对妈妈的药 · 第 2 步 / 共 3 步</span></div>
+  <div class="body">
+    <div style="display:flex;gap:16px;flex-wrap:wrap">
+      <div style="flex:0 0 140px">
+        <div class="imgbox" style="height:110px">［ 你拍的原图 ］</div>
+        <div style="font-size:11px;color:var(--mute);margin-top:5px;text-align:center">
+          点击放大 · 原图永久保留</div>
+      </div>
+      <div style="flex:1;min-width:250px">
+        <table>
+          <tr><th style="width:78px">字段</th><th>AI 读出的</th><th style="width:56px">确认</th></tr>
+          <tr><td>通用名</td><td><span class="inp">苯磺酸氨氯地平片</span></td>
+            <td><span class="chk on"></span></td></tr>
+          <tr><td>商品名</td><td><span class="inp">络活喜</span></td><td><span class="chk on"></span></td></tr>
+          <tr><td><b>规格</b></td><td><span class="inp bad">5 mg</span>
+            <span style="font-size:11px;color:var(--warn);margin-left:5px">⚠ 请对照原图核对</span></td>
+            <td><span class="chk"></span></td></tr>
+          <tr><td>用法</td><td><span class="inp">每天 1 次，每次 1 片</span></td>
+            <td><span class="chk on"></span></td></tr>
+          <tr><td>时间</td><td><span class="inp">早上 8:00</span>
+            <span style="font-size:11px;color:var(--mute);margin-left:5px">可调整</span></td>
+            <td><span class="chk on"></span></td></tr>
+        </table>
+        <div style="margin-top:12px">
+          <span class="btnw" style="background:#c9cfd6">全部确认后才能生效</span>
+          <span class="btnw ghost" style="margin-left:6px">这盒不要了</span>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:15px;padding:11px 13px;background:#fbeeed;border-radius:6px;font-size:12.5px">
+      <b style="color:var(--stop)">⚠ 安全检查发现 1 项</b><br>
+      这盒<b>苯磺酸氨氯地平片</b>和你上传的第 4 盒<b>络活喜</b>是<b>同一种药</b>（通用名相同）。
+      两盒都吃可能造成<b>重复用药</b>。请确认是否只留一盒，或先咨询医生。
+    </div>
+  </div>
+</div>
+<div class="box red">
+  <div class="lbl">这一屏是整个产品的安全阀</div>
+  <p><b>剂量字段默认不勾选</b>，必须人工核对——VLM 把 5mg 读成 50mg，输出的 JSON 依然工整自信，
+  <b>从结果上完全看不出来</b>。原图始终并排显示，一键放大。</p>
+  <p>永远不做全自动生效。这不是可优化项，是红线。</p>
+</div>
+
+<h3>D3　最后一步：称呼与联系方式　<span style="color:var(--acc);font-size:13px">← 之前缺的一屏</span></h3>
+<p class="lead"><b>为什么放在最后，而不是一开始。</b>
+把手机号做成第一屏，等于让一个还没得到任何东西的人先交个人信息——那是注册表单，转化率会崩。
+放在这里，子女已经投入了 5 分钟、已经看到用药表快成型了，<b>此时留联系方式是顺理成章的。</b></p>
+
+<div class="screens">
+  <div class="scr">
+    <div class="cap">D3　设置 <span>· 一次性</span></div>
+    <div class="ph">
+      <div class="mk" style="top:34px;left:-9px">1</div>
+      <div class="mk" style="top:126px;left:-9px">2</div>
+      <div class="mk" style="top:212px;left:-9px">3</div>
+      <div class="mk" style="top:300px;left:-9px">4</div>
+      <div style="font-size:15px;font-weight:800;margin:2px 0 9px">最后一步</div>
+
+      <div style="font-size:11.5px;color:var(--mute)">手机里怎么称呼妈妈</div>
+      <div class="inp" style="display:block;margin:3px 0 9px;padding:7px 9px;font-size:13.5px">
+        王阿姨</div>
+
+      <div style="font-size:11.5px;color:var(--mute)">妈妈平时怎么叫你</div>
+      <div class="inp" style="display:block;margin:3px 0 9px;padding:7px 9px;font-size:13.5px">
+        小芳</div>
+
+      <div style="font-size:11.5px;color:var(--mute)">你的手机号</div>
+      <div class="inp" style="display:block;margin:3px 0 9px;padding:7px 9px;font-size:13.5px">
+        138 **** 6688</div>
+
+      <div class="card" style="padding:9px 10px;display:flex;gap:9px;align-items:center">
+        <div class="imgbox" style="width:44px;height:44px;flex:0 0 44px;font-size:9px">二维码</div>
+        <div style="font-size:11.5px;line-height:1.5">
+          <b style="font-size:12.5px">接收微信通知</b><br>
+          <span style="color:var(--mute)">长按识别，一次就好</span></div>
+      </div>
+      <div style="flex:1"></div>
+      <div class="btn" style="background:var(--go);color:#fff;padding:12px 0;font-size:15px">
+        完成，生成用药表</div>
+    </div>
+    <ol class="anno">
+      <li>用于<b>语音播报</b>：「<b>王阿姨</b>，现在早上八点…」。
+      语音怎么称呼老人，只有子女知道得对</li>
+      <li>决定老人端按钮显示<b>「给小芳打电话」</b>而不是「给女儿打电话」——
+      用老人自己的说法</li>
+      <li>接到 B3／C3 的拨号按钮。<b>ACTION_DIAL 一行代码，不需要通话权限</b></li>
+      <li>推送绑定是<b>扫码</b>不是填号码（PushPlus 机制）。
+      和上面的手机号是<b>两条独立通道</b>，一条断了还有另一条</li>
+    </ol>
+  </div>
+
+  <div class="scr" style="flex:1 1 380px;width:auto">
+    <div class="cap">这一屏之后：试听 + 装机交接</div>
+    <div class="web" style="margin-top:2px">
+      <div class="bar"><i></i><i></i><i></i><span style="margin-left:6px">建好了 · 下一步装到妈妈手机上</span></div>
+      <div class="body">
+        <div style="padding:11px 13px;background:var(--acc-bg);border-radius:6px;font-size:12.5px">
+          <b>先听一遍妈妈会听到什么</b>
+          <div style="margin-top:7px;display:flex;gap:9px;align-items:center">
+            <span style="width:28px;height:28px;border-radius:50%;background:var(--acc);color:#fff;
+                  display:flex;align-items:center;justify-content:center;font-size:12px">▶</span>
+            <span style="font-style:italic">「王阿姨，现在早上八点，该吃降压药了，白色小盒子那个，一片。」</span>
+          </div>
+          <div style="margin-top:6px;font-size:11.5px;color:var(--mute)">
+            称呼不对？<a href="#" style="color:var(--acc)">回上一步改</a></div>
+        </div>
+        <div style="margin-top:13px;font-size:12.5px">
+          <b>装到妈妈手机上</b>
+          <ol style="margin:6px 0 0;padding-left:19px;line-height:1.8">
+            <li>把这个链接发到<b>妈妈的微信</b>，或者当面用她手机打开</li>
+            <li><b style="color:var(--stop)">页面自动检测这台手机能不能装</b>
+                —— 装不了会直接说，并给替代方案（见 D3a）</li>
+            <li>点「下载」→ 允许安装 → 装好</li>
+            <li><b style="color:var(--warn)">打开后按提示开 3–4 个权限</b>（见 D3b）</li>
+            <li>把图标<b>拖到第一屏，放在微信旁边</b></li>
+          </ol>
+        </div>
+        <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+          <span class="btnw">发给妈妈</span>
+          <span class="btnw ghost">大字用药表发到家庭群</span>
+          <span class="btnw ghost" style="color:var(--mute)">存为图片</span>
+        </div>
+      </div>
+    </div>
+    <div class="box" style="margin-top:12px">
+      <div class="lbl">两个刻意的设计</div>
+      <p><b>① 让子女先试听。</b>称呼念错（比如老人不叫"王阿姨"叫"王姨"）
+      是最容易发生、也最伤感情的错误，而只有子女能发现。<br>
+      <b>而且这一下就是这 5 分钟的回报</b>——听到那句话的情绪冲击，
+      比拿到一份文件强得多。<b>它接替了原来"打印稿"的诱饵角色。</b></p>
+      <p><b>② 大字用药表和装机并列，且不需要打印机。</b>
+      就算 APK 装不上（手机太旧、权限找不到），<b>家庭群里那张大字图片还在</b>，
+      老人自己能在微信里打开放大看——这 5 分钟不白花。</p>
+    </div>
+    <div class="box warn" style="margin-top:10px">
+      <div class="lbl">POC 阶段的简化</div>
+      <p><b>只支持一个联系人。</b>多子女、老伴、护工的多联系人体系——
+      优先级、谁先响应、去重——是真正的复杂度，
+      <b>5 个用户的 POC 一律不做</b>（比砍掉拨号按钮省得多）。</p>
+    </div>
+  </div>
+</div>
+
+<h3>D3a / D3b　装机两道关：能不能装 · 要开哪些权限</h3>
+<p class="lead">装机是整条链路上<b>唯一一次需要技术操作</b>的地方，也是最容易当场失败的地方。
+只问两个问题，<b>不做严重程度分级、不做健康监控</b>。</p>
+
+<div class="screens">
+  <div class="scr">
+    <div class="cap">D3a　装不了 <span>· 下载按钮之前</span></div>
+    <div class="ph">
+      <div class="mk" style="top:22px;left:-9px">1</div>
+      <div class="mk" style="top:236px;left:-9px">2</div>
+      <div class="card" style="background:#fbeeed;border-color:#e5b6b1">
+        <div style="font-size:15px;font-weight:800;color:var(--stop)">这台手机装不了</div>
+        <div style="font-size:12.5px;margin-top:5px;line-height:1.6">
+          妈妈这台手机是<b>新版鸿蒙</b>，<br>不能安装这类应用。</div>
+      </div>
+      <div style="height:12px"></div>
+      <div style="font-size:12.5px;font-weight:700">还是可以用这两样：</div>
+      <div class="card" style="margin-top:7px;padding:9px 10px">
+        <div style="font-size:12.5px;font-weight:700">① 大字用药表</div>
+        <div style="font-size:11px;color:var(--mute);margin-top:2px">
+          存成图片 → 设成妈妈手机锁屏</div>
+      </div>
+      <div class="card" style="margin-top:6px;padding:9px 10px">
+        <div style="font-size:12.5px;font-weight:700">② 你这边的网页</div>
+        <div style="font-size:11px;color:var(--mute);margin-top:2px">
+          用药档案、化验单解读照常能用</div>
+      </div>
+      <div style="flex:1"></div>
+      <div class="btn" style="background:var(--go);color:#fff;padding:12px 0;font-size:14.5px">
+        生成大字用药表</div>
+    </div>
+    <ol class="anno">
+      <li><b>不显示下载按钮</b>。只有三种情况会走到这里：新版鸿蒙 / 非安卓 / Android 8 以下</li>
+      <li><b>说了"不行"就必须马上给"还能怎么办"</b>。
+      否则这个家庭在这里彻底流失——而 P2/P3 的价值其实不依赖 APK</li>
+    </ol>
+  </div>
+
+  <div class="arrow">→</div>
+
+  <div class="scr">
+    <div class="cap">D3b　权限设置 <span>· 装完首次打开</span></div>
+    <div class="ph">
+      <div class="mk" style="top:22px;left:-9px">1</div>
+      <div class="mk" style="top:130px;left:-9px">2</div>
+      <div class="mk" style="top:330px;left:-9px">3</div>
+      <div style="font-size:15px;font-weight:800">装好了，还差几步</div>
+      <div style="font-size:11.5px;color:var(--mute);margin:2px 0 10px">
+        这台手机（华为 畅享60）需要：</div>
+
+      <div class="card" style="padding:9px 10px;margin-bottom:6px;display:flex;
+           gap:8px;align-items:center">
+        <span style="color:var(--go);font-weight:800;font-size:15px">✓</span>
+        <div style="flex:1;font-size:13px;font-weight:700">允许通知</div>
+      </div>
+      <div class="card" style="padding:9px 10px;margin-bottom:6px;display:flex;
+           gap:8px;align-items:center;border-color:#e5b6b1">
+        <span style="color:var(--stop);font-weight:800;font-size:15px">✗</span>
+        <div style="flex:1;font-size:13px;font-weight:700">允许准时提醒</div>
+        <span style="background:var(--go);color:#fff;font-size:11.5px;font-weight:700;
+              padding:4px 9px;border-radius:5px">去设置</span>
+      </div>
+      <div class="card" style="padding:9px 10px;margin-bottom:6px;display:flex;
+           gap:8px;align-items:center;border-color:#e5b6b1">
+        <span style="color:var(--stop);font-weight:800;font-size:15px">✗</span>
+        <div style="flex:1;font-size:13px;font-weight:700">关闭省电限制</div>
+        <span style="background:var(--go);color:#fff;font-size:11.5px;font-weight:700;
+              padding:4px 9px;border-radius:5px">去设置</span>
+      </div>
+      <div class="card" style="padding:9px 10px;display:flex;gap:8px;align-items:center;
+           border-color:#e5b6b1">
+        <span style="color:var(--stop);font-weight:800;font-size:15px">✗</span>
+        <div style="flex:1;font-size:13px;font-weight:700">允许自启动</div>
+        <span style="background:var(--go);color:#fff;font-size:11.5px;font-weight:700;
+              padding:4px 9px;border-radius:5px">去设置</span>
+      </div>
+      <div style="flex:1"></div>
+      <div class="btn" style="background:#eef1f4;border:1.5px solid var(--line2);
+           color:#333a41;padding:12px 0;font-size:14.5px">我设好了</div>
+    </div>
+    <ol class="anno">
+      <li>标题写明<b>具体机型</b>——让子女确信步骤是针对这台手机的，不是通用废话</li>
+      <li><b>只有 ✓ / ✗ 两态，没有严重程度分级</b>。「去设置」按钮
+      按 <code>Build.MANUFACTURER</code> 跳到对应品牌的页面</li>
+      <li>点「我设好了」→ <b>重新检测</b>，还没设的继续标红。不信任用户的自我报告</li>
+    </ol>
+  </div>
+
+  <div class="scr" style="flex:1 1 320px;width:auto">
+    <div class="cap">华为特有：装之前还有一道</div>
+    <div class="box red" style="margin-top:2px">
+      <div class="lbl">纯净模式 —— 装机流程最容易卡死的一步</div>
+      <p>华为的<b>纯净模式默认开启</b>，安装非应用市场的 APK 会被直接拦截，
+      提示「未通过华为应用市场安全检测」。</p>
+      <p><b>而退出纯净模式需要登录华为账号。</b></p>
+      <p>老人多半不记得账号密码 → <b>子女用自己的账号临时登一下</b>。
+      <b>这一步排在所有权限设置之前</b>，页面上必须提前告知，
+      别让人下载完才发现装不上。</p>
+    </div>
+    <table style="margin-top:12px">
+      <tr><th style="width:96px">机型</th><th>装机前额外步骤</th></tr>
+      <tr><td><b>华为 / 荣耀</b></td>
+        <td><span class="flag f-stop">退出纯净模式</span>（需华为账号）+ 允许安装未知应用</td></tr>
+      <tr><td>小米 / 红米</td><td>允许安装未知应用</td></tr>
+      <tr><td>OPPO / vivo</td><td>允许安装未知应用</td></tr>
+    </table>
+    <div class="box warn" style="margin-top:12px">
+      <div class="lbl">装完之后被关掉了怎么办</div>
+      <p><b>不做单独的健康监控。</b>这个失效已经有一个现成信号：<br>
+      <b>闹钟不响 → 剂次没人确认 → 子女已经收到「还没确认」的提醒</b>。</p>
+      <p>子女看到连续未确认时，看板上给一个入口重新打开 D3b 这一屏就够了。
+      <b>一个已经在跑的信号，好过一套需要单独维护的健康检查。</b></p>
+    </div>
+  </div>
+</div>
+
+<h3>D4　首页看板 —— 注意"三态"，不是二态</h3>
+<p class="lead">以上是一次性设置。从这里开始是<b>日常使用</b>。</p>
+<div class="web">
+  <div class="bar"><i></i><i></i><i></i><span style="margin-left:6px">妈妈的用药 · 今天 8 月 5 日</span></div>
+  <div class="body">
+    <table>
+      <tr><th style="width:88px">时间</th><th style="width:150px">药</th>
+        <th style="width:150px">状态</th><th>说明</th></tr>
+      <tr><td>早上 8:00</td><td>降压药 1 片</td>
+        <td><span class="flag f-go">已确认</span></td>
+        <td style="color:var(--mute)">8:02 确认，看了 24 秒</td></tr>
+      <tr><td>中午 12:00</td><td>降糖药 1 片</td>
+        <td><span class="flag f-warn">已点击（存疑）</span></td>
+        <td style="color:var(--warn)"><b>响铃后 0.8 秒即按下，未停留</b>——可能只是消音</td></tr>
+      <tr><td>晚上 18:00</td><td>他汀 1 片</td>
+        <td><span class="flag f-mute">还没到</span></td><td style="color:var(--mute)">—</td></tr>
+      <tr><td>睡前 21:00</td><td>护胃药 1 片</td>
+        <td><span class="flag f-mute">还没到</span></td><td style="color:var(--mute)">—</td></tr>
+    </table>
+    <div style="margin-top:14px;padding:11px 13px;background:#fdf7ec;border-radius:6px;font-size:12.5px">
+      <b>本周提示</b>　「等会儿吃」使用了 6 次（上周 1 次）。
+      推迟变多通常意味着作息变了、或者按钮操作有困难 —— 建议打个电话问问。
+    </div>
+  </div>
+</div>
+<div class="box warn">
+  <div class="lbl">为什么必须是三态</div>
+  <p>系统记录的是「<b>按了按钮</b>」，不是「<b>吃了药</b>」。
+  把可疑的那条<b>如实标出来</b>，而不是混进"已确认"里凑一个好看的依从率——
+  <b>虚假确定性比没有数据更危险</b>，子女会因此放松警惕。</p>
+  <p><b>永远不显示"依从率 92%"这样的单一数字。</b>这份数据适合<b>发现变化</b>和<b>触发一通电话</b>，
+  不适合下绝对结论，更不能当作考核护工的 KPI。</p>
+</div>
+
+<h3>D5　收到升级 → 听原声 → 回复</h3>
+<div class="web">
+  <div class="bar"><i></i><i></i><i></i><span style="margin-left:6px">妈妈说了一句话 · 刚刚</span></div>
+  <div class="body">
+    <div style="display:flex;gap:9px;align-items:center;margin-bottom:11px">
+      <span class="flag f-stop">最高紧急</span>
+      <span style="font-size:12px;color:var(--mute)">14:32 · 触发于「这次不吃 → 今天不舒服」</span>
+    </div>
+    <div class="card" style="max-width:460px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:32px;height:32px;border-radius:50%;background:var(--stop);color:#fff;
+             display:flex;align-items:center;justify-content:center;font-size:14px">▶</div>
+        <div style="font-size:13px;font-weight:700">妈妈的原声　8 秒</div>
+      </div>
+      <div style="margin-top:9px;padding-top:9px;border-top:1px dashed var(--line);font-size:13.5px">
+        「我今天胸口有点闷，这个药我先不吃了」</div>
+      <div style="font-size:11px;color:var(--mute);margin-top:5px">
+        ↑ 语音转写，<b>未经任何改写</b>。请以原声为准</div>
+    </div>
+    <div style="margin-top:13px;font-size:12.5px;color:var(--ink2)">
+      <b>当时的用药方案</b>　降压药（苯磺酸氨氯地平 5mg）· 他汀 · 二甲双胍 ·
+      <a href="#" style="color:var(--acc)">查看完整档案</a>
+    </div>
+    <div style="margin-top:13px">
+      <span class="btnw">录一段语音回她</span>
+      <span class="btnw ghost" style="margin-left:6px">打字回复</span>
+      <span class="btnw ghost" style="margin-left:6px">现在就打电话</span>
+    </div>
+  </div>
+</div>
+<div class="box">
+  <div class="lbl">三个细节</div>
+  <p><b>① 原话原声直送</b>，绝不让 LLM 改写成"患者主诉胸闷"——语气、犹豫、方言用词里有信息，
+  而且 ASR 可能转错，录音是唯一凭证。</p>
+  <p><b>② 附上当时的用药方案快照</b>，子女不用再去翻。</p>
+  <p><b>③ 回复必须能回传到老人端（C4）。</b>没有闭环，这个功能三周内就会死掉。</p>
+</div>
+
+<h3>D6　化验单：转录 · 对比 · 放大</h3>
+<div class="web">
+  <div class="bar"><i></i><i></i><i></i><span style="margin-left:6px">2026-08-01 生化全套 · XX 市第一人民医院</span></div>
+  <div class="body">
+    <table style="max-width:560px">
+      <tr><th style="width:110px">项目</th><th style="width:90px">这次</th>
+        <th style="width:90px">上次 (05-12)</th><th style="width:110px">参考范围</th><th>变化</th></tr>
+      <tr><td>血肌酐</td><td><b style="color:var(--stop)">118 ↑</b></td><td>96</td><td>57 – 97</td>
+        <td style="color:var(--stop)">＋22</td></tr>
+      <tr><td>空腹血糖</td><td><b>6.1</b></td><td>7.4</td><td>3.9 – 6.1</td>
+        <td style="color:var(--go-d)">－1.3</td></tr>
+      <tr><td>总胆固醇</td><td><b style="color:var(--stop)">6.3 ↑</b></td><td>6.1</td><td>&lt; 5.2</td>
+        <td style="color:var(--stop)">＋0.2</td></tr>
+    </table>
+    <div style="margin-top:14px;padding:11px 13px;background:var(--acc-bg);border-radius:6px;font-size:12.5px">
+      <b>下次复诊，建议问医生这 3 个问题</b>
+      <ol style="margin:6px 0 0;padding-left:19px">
+        <li>血肌酐从 96 升到 118，需要调整现在的用药吗？</li>
+        <li>现在吃的这几种药里，有需要根据肾功能减量的吗？</li>
+        <li>下次复查应该间隔多久？</li>
+      </ol>
+    </div>
+    <div style="margin-top:14px;padding:11px 13px;background:var(--panel);border-radius:6px">
+      <div style="font-size:12.5px;font-weight:700;margin-bottom:7px">
+        医生版（近 3 次对比 + 当前用药清单）· <b>两种带法，都不需要打印机</b></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <span class="btnw">发到家庭微信群</span>
+        <span class="btnw ghost">存为图片</span>
+      </div>
+      <div style="font-size:11.5px;color:var(--mute);margin-top:8px;line-height:1.6">
+        另一条更可靠：<b>老人端首页的「给医生看」</b>，在诊室点一下全屏显示，直接把手机递过去——
+        <b>零准备、永远可用</b>，不依赖任何人提前做事。<br>
+        <b style="color:var(--stop)">PDF 打印导出：不做</b>（依赖硬件，且排版分页工作量不小）</div>
+    </div>
+    <div style="margin-top:10px"><span class="btnw ghost">查看原图</span></div>
+  </div>
+</div>
+<div class="box red">
+  <div class="lbl">这一屏为什么没有一句"解读"</div>
+  <p>产品对检查报告<b>只做三件机械的事</b>：<b>转录</b>（把单子上已印的数值和参考范围搬过来）、
+  <b>对比</b>（做减法）、<b>放大</b>（字号与语音）。</p>
+  <p>绝不写「这提示肾功能下降」——<b>那是行医，个人主体没有任何资质</b>，
+  而且会让产品被认定为医疗器械，注册周期以年计。
+  「建议问医生这 3 个问题」是安全的：它<b>帮人提问，不替人判断</b>。</p>
+</div>
+
+<h3>D7　老人端看到的同一份化验单</h3>
+<div class="screens">
+  <div class="scr">
+    <div class="cap">D7　老人版 <span>· 只有 3 句话</span></div>
+    <div class="ph">
+      <div class="mk" style="top:150px;left:-9px">1</div>
+      <div class="center" style="align-items:flex-start;text-align:left;padding:0 4px">
+        <div style="font-size:17px;font-weight:700;color:var(--mute);margin-bottom:14px">8 月 1 日体检</div>
+        <div style="font-size:21px;font-weight:800;line-height:1.6">
+          一共查了 32 项<br>
+          有 <span style="color:var(--stop)">3 项</span> 超出范围<br>
+          <span style="color:var(--go-d)">血糖比上次降下来了</span>
+        </div>
+        <div style="height:14px"></div>
+        <div style="font-size:16px;font-weight:700;background:var(--panel);padding:9px 11px;
+             border-radius:8px;width:100%">医生让你继续吃原来的药</div>
+      </div>
+      <div class="b-mic" style="padding:12px 0;font-size:13.5px">🔊 再念一遍</div>
+    </div>
+    <ol class="anno">
+      <li>三句话，<b>不解释任何医学含义</b>。同一份数据，三个人看到三种东西：
+      老人 3 句话 / 子女异常项与问题清单 / 医生一页对比表</li>
+    </ol>
+  </div>
+
+  <div class="scr" style="flex:1 1 340px;width:auto">
+    <div class="cap">E　大字用药表 <span>· 一张图片，不是一张纸</span></div>
+    <div class="sheet" style="max-width:290px">
+      <h4>妈妈的吃药表</h4>
+      <div class="who">有问题打电话给小芳 138****6688</div>
+      <table>
+        <tr><th style="width:76px">什么时候</th><th style="width:46px">样子</th><th>吃什么</th></tr>
+        <tr><td>早上 8 点</td><td><span class="pill"></span></td><td>降压药　1 片</td></tr>
+        <tr><td>中午 12 点</td><td><span class="pill"></span></td><td>降糖药　1 片</td></tr>
+        <tr><td>晚上 6 点</td><td><span class="pill"></span></td><td>他汀　　1 片</td></tr>
+        <tr><td>睡觉前</td><td><span class="pill"></span></td><td>护胃药　1 片</td></tr>
+      </table>
+    </div>
+    <div class="note">
+      <b>两个去处：</b><br>
+      ① <b>设成老人手机锁屏</b>（APK 内一键）　② <b>发到家庭微信群</b><br>
+      <span style="color:var(--stop)">不做打印导出</span>
+    </div>
+  </div>
+</div>
+
+<div class="box red">
+  <div class="lbl">一次修正：从「打印贴冰箱」改成「设成锁屏」</div>
+  <p>初稿把它设计成一张要<b>打印</b>的 A4 纸。问题是——<b>大多数中国家庭没有打印机</b>，
+  而这一步恰好卡在冷启动，是最不能有摩擦的位置。</p>
+  <p>但它原本承担三个作用，不能直接删：</p>
+  <table style="margin:8px 0">
+    <tr><th style="width:120px">原作用</th><th style="width:150px">改后由谁承担</th><th>说明</th></tr>
+    <tr><td><b>零设备价值</b><br><span style="color:var(--mute);font-size:11.5px">老人不碰电子设备也能用</span></td>
+      <td><span class="flag f-go">锁屏壁纸</span></td>
+      <td><b>比贴冰箱更好</b>：老人一天看几十次锁屏，<b>零导航、永远在手边</b>，
+        而且冰箱只在厨房</td></tr>
+    <tr><td><b>APK 故障兜底</b></td>
+      <td><span class="flag f-go">锁屏 + 微信群图片</span></td>
+      <td>壁纸即使 App 被卸载也还在；微信群那张老人自己就能打开放大看</td></tr>
+    <tr><td><b>冷启动诱饵</b><br><span style="color:var(--mute);font-size:11.5px">给这 5 分钟一个回报</span></td>
+      <td><span class="flag f-warn">改由「试听」承担</span></td>
+      <td>见 D3——<b>子女听到「王阿姨，现在早上八点…」那一刻的情绪冲击，
+        比一张打印稿强得多</b>，而且零成本</td></tr>
+  </table>
+  <p><b>技术上很便宜</b>：<code>WallpaperManager.setBitmap(bmp, null, true, FLAG_LOCK)</code>，
+  <code>SET_WALLPAPER</code> 是普通权限。约半天工作量。</p>
+  <p><b>但要设成可选并说清代价</b>：老人的锁屏往往是孙子的照片。
+  <b>换掉它是有情感成本的</b>——必须让子女明确知道自己在换什么，别偷偷替换。</p>
+</div>
+
+<!-- ================= F ================= -->
+<h2><span class="n">F</span>第 11 天上门时，重点看这五件事</h2>
+<p class="lead">这份 wireframe 里的每一个判断都是假设。下面五条是最可能被推翻的。</p>
+<table>
+  <tr><th style="width:30px">#</th><th style="width:230px">观察什么</th><th>如果错了意味着什么</th></tr>
+  <tr><td>1</td><td><b>他是先拿药还是先按按钮</b></td>
+    <td>若普遍先按后拿（甚至不拿），A2 的点击数据基本无效，需要引入实物核对（周药盒拍照）</td></tr>
+  <tr><td>2</td><td><b>他会不会用那两个次级按钮</b></td>
+    <td>五个人里一个都不用 → 层级藏得太深，尺寸要再放大或改配色</td></tr>
+  <tr><td>3</td><td><b>手机平时放在哪</b></td>
+    <td>若常年在客厅充电、人在卧室 → 语音播报全部落空，
+    正确的下一步是<b>智能音箱</b>，而不是继续改 App</td></tr>
+  <tr><td>4</td><td><b>他会不会长按说话</b></td>
+    <td>一次都不问 → 语音问答是伪需求，产品退化成带照片的闹钟，而那不值得做</td></tr>
+  <tr><td>5</td><td><b>抽屉里有没有旧化验单</b></td>
+    <td>有 → 一次性拍完，直接跳过 3–6 个月的数据积累等待期</td></tr>
+  <tr><td>6</td><td><b>子女拍完 5 盒药用了几分钟</b><br>
+    <span style="color:var(--mute);font-size:11.5px">中途放弃了吗？</span></td>
+    <td><b>最该计时的一件事。</b>冷启动失败 → 后面所有设计一个都不会发生。
+    超过 10 分钟或有人中途退出，D1 就要重做</td></tr>
+  <tr><td>7</td><td><b>老人有没有觉得手机"被占了"</b></td>
+    <td>若他抱怨影响用微信、或找不到怎么关掉 → 全屏接管的边界还要再收</td></tr>
+</table>
+
+<footer>
+  配套文档：《老人健康助手 · 方案总结》(HTML) 与《POC 方案》(Markdown)。<br>
+  <b>免责</b>：本文档为产品设计讨论稿，不构成医疗建议。所示产品明确不提供诊疗建议、不建议调整剂量或停药。
+</footer>
+
+</div>
+</body>
+</html>

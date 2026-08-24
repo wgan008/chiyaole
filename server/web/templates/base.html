@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>{% block title %}吃药了{% endblock %}</title>
+<link rel="stylesheet" href="/web-static/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">吃药了</div>
+  {% if patient_id %}
+  <nav>
+    <a href="/web/{{ patient_id }}/upload?t={{ token }}">拍照识别</a>
+    <a href="/web/{{ patient_id }}/confirm?t={{ token }}">确认用药</a>
+    <a href="/web/{{ patient_id }}/lab?t={{ token }}">化验单</a>
+    <a href="/web/{{ patient_id }}/dashboard?t={{ token }}">今天</a>
+    <a href="/web/{{ patient_id }}/elders?t={{ token }}">我的老人</a>
+    <a href="/web/{{ patient_id }}/setup?t={{ token }}">联系方式</a>
+  </nav>
+  {% endif %}
+</header>
+<main class="content">
+{% block content %}{% endblock %}
+</main>
+<script>
+  window.CHIYAOLE = { patientId: {{ patient_id | tojson }}, token: {{ token | tojson }} };
+</script>
+<script src="/web-static/app.js"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>
