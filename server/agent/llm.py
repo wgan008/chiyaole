@@ -52,9 +52,11 @@ def complete_json(
         {"role": "user", "content": prompt}
     ]
     try:
+        # dashscope's Message stub is stricter than the plain role/content dicts its own
+        # runtime actually accepts — type: ignore, not a rewrite of a working call.
         resp = dashscope.Generation.call(
             model=model,
-            messages=messages,
+            messages=messages,  # type: ignore[arg-type]
             result_format="message",
             temperature=temperature,
             response_format={"type": "json_object"},
@@ -86,7 +88,10 @@ def complete_text(
     ]
     try:
         resp = dashscope.Generation.call(
-            model=model, messages=messages, result_format="message", temperature=temperature
+            model=model,
+            messages=messages,  # type: ignore[arg-type]  # see complete_json's own note
+            result_format="message",
+            temperature=temperature,
         )
         return str(resp.output.choices[0].message.content)  # type: ignore[union-attr]
     except Exception as exc:  # noqa: BLE001

@@ -30,7 +30,7 @@ try:  # pypinyin is an offline package; the fallback keeps tests runnable withou
     from pypinyin import Style, lazy_pinyin
 except ImportError:  # pragma: no cover
     lazy_pinyin = None  # type: ignore[assignment]
-    Style = None  # type: ignore[assignment]
+    Style = None  # type: ignore  # mypy reports a different code here depending on version
 
 
 # --------------------------------------------------------------------------- text cleanup

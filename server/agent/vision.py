@@ -128,12 +128,12 @@ def parse_medbox(image_urls: list[str]) -> MedboxParse:
         strength_unit = _unit_suffix(data.get("strength_value"))
 
     parse = MedboxParse(
-        generic_name=data.get("generic_name"),
-        brand_name=data.get("brand_name"),
+        generic_name=_str(data.get("generic_name")),
+        brand_name=_str(data.get("brand_name")),
         strength_value=_num(data.get("strength_value")),
         strength_unit=strength_unit,
-        usage_raw=data.get("usage_raw"),
-        manufacturer=data.get("manufacturer"),
+        usage_raw=_str(data.get("usage_raw")),
+        manufacturer=_str(data.get("manufacturer")),
         confidence=_confidence_dict(data.get("confidence")),
     )
     parse.missing = [f for f in _REQUIRED_FIELDS if getattr(parse, f) in (None, "")]
@@ -152,7 +152,10 @@ def parse_lab(image_urls: list[str]) -> LabParse:
 
     items: list[LabItemParse] = []
     unresolved: list[str] = []
-    for row in data.get("items") or []:
+    raw_items = data.get("items")
+    for row in raw_items if isinstance(raw_items, list) else []:
+        if not isinstance(row, dict):
+            continue
         name = str(row.get("raw_name") or "").strip()
         if not name:
             continue
@@ -177,9 +180,9 @@ def parse_lab(image_urls: list[str]) -> LabParse:
         )
 
     return LabParse(
-        report_date=data.get("report_date"),
-        report_type=data.get("report_type"),
-        hospital=data.get("hospital"),
+        report_date=_str(data.get("report_date")),
+        report_type=_str(data.get("report_type")),
+        hospital=_str(data.get("hospital")),
         items=items,
         unresolved=unresolved,
         confidence=_confidence_dict(data.get("confidence")),
@@ -197,7 +200,7 @@ def _confidence_dict(v: object) -> dict[str, float]:
     out: dict[str, float] = {}
     for k, val in v.items():
         try:
-            out[k] = float(val)  # type: ignore[arg-type]
+            out[k] = float(val)
         except (TypeError, ValueError):
             continue
     return out
@@ -239,6 +242,12 @@ def _num(v: object) -> float | None:
             except ValueError:
                 return None
     return None
+
+
+def _str(v: object) -> str | None:
+    """A field the model returned something other than a string for (or omitted) is the
+    same "could not read it" outcome as a missing field — never coerced, never guessed."""
+    return v if isinstance(v, str) else None
 
 
 # Real dosage units only — never a pack-count notation like "×7片". A box's specification
