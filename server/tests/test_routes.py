@@ -8,6 +8,7 @@ from __future__ import annotations
 from datetime import datetime, timedelta
 
 from fastapi.testclient import TestClient
+from freezegun import freeze_time
 from sqlalchemy.orm import Session
 
 from app.models import Caregiver, Dose, Medication, Patient
@@ -24,42 +25,47 @@ def test_config_returns_remote_config(client: TestClient) -> None:
 def test_today_three_state_bucketing(
     client: TestClient, session: Session, patient: Patient, caregiver: Caregiver
 ) -> None:
-    med = Medication(
-        patient_id=patient.id,
-        generic_name="氨氯地平",
-        dose_per_take=1.0,
-        times_per_day=1,
-        status="active",
-        confirmed_at=datetime.now(),
-    )
-    session.add(med)
-    session.flush()
-
-    now = datetime.now()
-
-    def dose(offset_hours: int, state: str) -> Dose:
-        return Dose(
-            medication_id=med.id,
+    # ★ Frozen at noon, not real wall-clock time: the -2h/-1h/+2h offsets below only stay
+    # inside *today's* calendar date (what the /today route buckets by) if "now" isn't
+    # within 2 hours of midnight — a real bug this test hit running late in the evening,
+    # unrelated to whatever change happened to be in flight at the time.
+    with freeze_time("2026-06-15 12:00:00"):
+        med = Medication(
             patient_id=patient.id,
-            scheduled_at=now + timedelta(hours=offset_hours),
-            state=state,
+            generic_name="氨氯地平",
+            dose_per_take=1.0,
+            times_per_day=1,
+            status="active",
+            confirmed_at=datetime.now(),
         )
+        session.add(med)
+        session.flush()
 
-    session.add_all(
-        [
-            dose(-2, "confirmed"),
-            dose(-1, "pending"),  # past-due, never confirmed -> "unknown"
-            dose(2, "pending"),  # future, not due yet -> "pending"
-        ]
-    )
-    session.flush()
+        now = datetime.now()
 
-    resp = client.get(f"/api/patient/{patient.id}/today?t={caregiver.access_token}")
-    assert resp.status_code == 200
-    body = resp.json()
-    assert len(body["confirmed"]) == 1
-    assert len(body["unknown"]) == 1  # past-due, never confirmed
-    assert len(body["pending"]) == 1  # future, not due yet
+        def dose(offset_hours: int, state: str) -> Dose:
+            return Dose(
+                medication_id=med.id,
+                patient_id=patient.id,
+                scheduled_at=now + timedelta(hours=offset_hours),
+                state=state,
+            )
+
+        session.add_all(
+            [
+                dose(-2, "confirmed"),
+                dose(-1, "pending"),  # past-due, never confirmed -> "unknown"
+                dose(2, "pending"),  # future, not due yet -> "pending"
+            ]
+        )
+        session.flush()
+
+        resp = client.get(f"/api/patient/{patient.id}/today?t={caregiver.access_token}")
+        assert resp.status_code == 200
+        body = resp.json()
+        assert len(body["confirmed"]) == 1
+        assert len(body["unknown"]) == 1  # past-due, never confirmed
+        assert len(body["pending"]) == 1  # future, not due yet
 
 
 def test_setup_contact_updates_caregiver(client: TestClient, caregiver: Caregiver) -> None:
