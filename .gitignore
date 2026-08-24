@@ -20,6 +20,7 @@ server/.env
 
 # Android
 android/.gradle/
+android/.kotlin/
 android/build/
 android/app/build/
 android/local.properties
@@ -29,8 +30,14 @@ android/.idea/
 *.jks
 *.keystore
 
-# Local dev DB/storage stand-ins — never real data, never committed
+# Local dev DB/storage stand-ins — never real data, never committed. *.db catches
+# server/local_dev.db specifically — it holds real caregiver access_token values, which
+# function as this app's login credentials (deps.py's "never types a password" model), not
+# just disposable test rows.
 server/.local_storage/
+*.db
+*.sqlite
+*.sqlite3
 
 # Real user data — MUST NOT be committed (spec §8.6)
 evals/asr_samples/*.wav
