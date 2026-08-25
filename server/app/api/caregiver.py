@@ -225,10 +225,15 @@ def parse_medbox_route(
             status_code=404, detail="one or more asset_ids not found for this patient"
         )
 
-    # ★ file:// paths, not storage.url_for() — the vision call runs ON this machine and
-    # can resolve/upload local files itself (confirmed live, scripts/test_vision.py); a
-    # storage.url_for() http://localhost URL would not be reachable from DashScope's side.
-    image_urls = [f"file://{storage.local_path(a.oss_key)}" for a in assets]
+    # ★ Local-disk mode: file:// paths, not storage.url_for() — the vision call runs ON
+    # this machine and can resolve/upload local files itself (confirmed live,
+    # scripts/test_vision.py); a storage.url_for() http://localhost URL would not be
+    # reachable from DashScope's side. Real OSS: url_for() IS a real, DashScope-reachable
+    # signed URL, so no local file:// trick is needed at all.
+    if storage.is_local():
+        image_urls = [f"file://{storage.local_path(a.oss_key)}" for a in assets]
+    else:
+        image_urls = [storage.url_for(a.oss_key) for a in assets]
 
     try:
         parsed = parse_medbox(image_urls)
@@ -520,7 +525,11 @@ def parse_lab_route(
             status_code=404, detail="one or more asset_ids not found for this patient"
         )
 
-    image_urls = [f"file://{storage.local_path(a.oss_key)}" for a in assets]
+    # See parse_medbox_route's own comment on this same branch.
+    if storage.is_local():
+        image_urls = [f"file://{storage.local_path(a.oss_key)}" for a in assets]
+    else:
+        image_urls = [storage.url_for(a.oss_key) for a in assets]
     try:
         parsed = parse_lab(image_urls)
     except LLMUnavailable as exc:
