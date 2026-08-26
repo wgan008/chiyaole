@@ -16,13 +16,20 @@ is always a bound parameter, on every path, without exception.
 
 from __future__ import annotations
 
-from datetime import UTC
 from typing import Any
+from zoneinfo import ZoneInfo
 
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from .types import QueryResult, Slots
+
+# ★ "Today" means China's calendar day, not UTC's — the server process runs in UTC (see
+# app/api/caregiver.py's own CHINA_TZ note), so for roughly 8 hours of every day (China's
+# 00:00-07:59) the UTC date is still "yesterday". Confirmed live as a real bug (dose times
+# stored 8 hours off); this function had the same class of mistake for "did I take my
+# meds today", just not yet caught live.
+CHINA_TZ = ZoneInfo("Asia/Shanghai")
 
 # --------------------------------------------------------------------------- statements
 
@@ -119,14 +126,14 @@ def last_report(session: Session, patient_id: str, slots: Slots) -> QueryResult:
 def med_taken_today(session: Session, patient_id: str, slots: Slots) -> QueryResult:
     from datetime import datetime, time
 
-    today = datetime.now(UTC).date()
+    today = datetime.now(CHINA_TZ).date()
     rows = _rows(
         session,
         _MED_TAKEN_TODAY,
         {
             "patient_id": patient_id,
-            "day_start": datetime.combine(today, time.min),
-            "day_end": datetime.combine(today, time.max),
+            "day_start": datetime.combine(today, time.min, tzinfo=CHINA_TZ),
+            "day_end": datetime.combine(today, time.max, tzinfo=CHINA_TZ),
         },
     )
     return QueryResult(intent="med_taken_today", rows=rows, empty=not rows)

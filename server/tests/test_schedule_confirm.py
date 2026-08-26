@@ -54,6 +54,54 @@ def test_confirm_with_explicit_times_creates_doses_at_those_times(
     assert times == ["07:30", "19:30"]
 
 
+def test_confirm_stores_times_as_china_wall_clock_not_naive(
+    client: TestClient, session: Session, patient: Patient, caregiver: Caregiver
+) -> None:
+    """★ Regression test for a real bug hit live: a caregiver picking "18:08" (meaning
+    18:08 Beijing time) got stored as `18:08+00` (UTC) — every server process/container
+    runs in UTC, and `datetime.combine(day, t)` with no tzinfo is silently interpreted as
+    whatever timezone the session/environment defaults to. Rendered back on the elder's
+    device, that showed as 02:08 the next day and the alarm fired 8 hours later than
+    intended.
+
+    ★ SQLite (this test's backend) strips tzinfo at flush time, not just on a later
+    re-query — even the in-memory ORM attribute reads back naive afterward (confirmed by
+    writing this test: a naive assertion on `dose.scheduled_at.tzinfo` after the request
+    fails identically whether or not the underlying bug is fixed, because SQLite cannot
+    represent "aware with the correct offset" vs "naive" as different states at all). A
+    `before_flush` listener is the only way to see the value app/api/caregiver.py's
+    _generate_doses actually constructed, before SQLite's dialect processing touches it."""
+    from sqlalchemy import event
+
+    med = _draft_med(session, patient, usage_raw="详见说明书")
+
+    captured: list[Dose] = []
+
+    def _capture(sess: Session, flush_context: object, instances: object) -> None:
+        captured.extend(d for d in sess.new if isinstance(d, Dose))
+
+    event.listen(session, "before_flush", _capture)
+    try:
+        resp = client.post(
+            f"/api/regimen/confirm?t={caregiver.access_token}",
+            json={
+                "medication_id": med.id, "fields": {}, "confirmed": True,
+                "times": ["18:08"],
+            },
+        )
+    finally:
+        event.remove(session, "before_flush", _capture)
+
+    assert resp.status_code == 200
+    assert captured, "expected at least one dose to have been created"
+    for d in captured:
+        assert d.scheduled_at.tzinfo is not None, "scheduled_at must not be naive"
+        assert d.scheduled_at.utcoffset() == timedelta(hours=8), (
+            f"expected China's fixed UTC+8 offset, got {d.scheduled_at.utcoffset()}"
+        )
+        assert d.scheduled_at.strftime("%H:%M") == "18:08"
+
+
 def test_confirm_without_times_falls_back_to_text_derivation(
     client: TestClient, session: Session, patient: Patient, caregiver: Caregiver
 ) -> None:

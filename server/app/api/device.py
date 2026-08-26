@@ -17,6 +17,7 @@ from __future__ import annotations
 import logging
 import uuid
 from datetime import datetime, time
+from zoneinfo import ZoneInfo
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from fastapi.responses import JSONResponse
@@ -47,6 +48,9 @@ from ..schemas import (
 from ..services import storage
 
 logger = logging.getLogger(__name__)
+
+# ★ See caregiver.py's own CHINA_TZ — same "every container runs in UTC" bug applies here.
+CHINA_TZ = ZoneInfo("Asia/Shanghai")
 
 router = APIRouter(prefix="/api", tags=["device"])
 
@@ -117,7 +121,7 @@ def get_schedule(
         )
         for dose, med, asset in rows
     ]
-    return ScheduleOut(items=items, generated_at=datetime.now())
+    return ScheduleOut(items=items, generated_at=datetime.now(CHINA_TZ))
 
 
 @router.post("/events")
@@ -163,7 +167,7 @@ def post_events(
                 dwell_ms=event.dwell_ms,
                 ring_index=event.ring_index,
                 source=event.source,
-                synced_at=datetime.now(),
+                synced_at=datetime.now(CHINA_TZ),
             )
         )
         dose.state = state_by_action[event.action]
@@ -282,8 +286,11 @@ def _active_medications(session: Session, patient_id: str) -> list[Medication]:
 
 
 def _today_range() -> tuple[datetime, datetime]:
-    today = datetime.now().date()
-    return datetime.combine(today, time.min), datetime.combine(today, time.max)
+    today = datetime.now(CHINA_TZ).date()
+    return (
+        datetime.combine(today, time.min, tzinfo=CHINA_TZ),
+        datetime.combine(today, time.max, tzinfo=CHINA_TZ),
+    )
 
 
 def _dose_view(dose: Dose, med: Medication) -> DoseView:

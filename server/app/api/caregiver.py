@@ -13,6 +13,7 @@ from __future__ import annotations
 import json
 import secrets
 from datetime import date, datetime, time, timedelta
+from zoneinfo import ZoneInfo
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from sqlalchemy import delete, func, select
@@ -62,6 +63,15 @@ from ..schemas import (
 )
 from ..services import storage
 
+# ★ Every server process/container in this deployment runs in UTC (confirmed live: both
+# app and postgres containers report `date` as UTC, and nothing in docker-compose.yml sets
+# TZ) — a bare `datetime.now()` is UTC wall-clock time, not China's. Confirmed live a
+# second time: a caregiver picking "18:08" in the confirm wizard, meaning 18:08 Beijing
+# time, got stored as `18:08+00` (UTC) and rendered back as 02:08 the next day in China —
+# every dose time and every "what day is today" boundary in this file must use this
+# explicitly, never a naive datetime.now()/date.today().
+CHINA_TZ = ZoneInfo("Asia/Shanghai")
+
 router = APIRouter(prefix="/api", tags=["caregiver"])
 
 
@@ -103,12 +113,12 @@ def _generate_doses(
     med: Medication, patient_id: str, times: list[time], session: Session, *, days: int = 7
 ) -> int:
     created = 0
-    start = date.today()
-    now = datetime.now()
+    now = datetime.now(CHINA_TZ)
+    start = now.date()
     for offset in range(days):
         day = start + timedelta(days=offset)
         for t in times:
-            when = datetime.combine(day, t)
+            when = datetime.combine(day, t, tzinfo=CHINA_TZ)
             if when <= now:
                 # Never invent a dose in the past — today's slots earlier than "right now"
                 # (e.g. the caregiver edits the schedule mid-afternoon) simply start
@@ -293,7 +303,7 @@ def confirm_medication(
 
     med.status = "active"
     med.confirmed_by = caregiver.id
-    med.confirmed_at = datetime.now()
+    med.confirmed_at = datetime.now(CHINA_TZ)
 
     if body.times:
         # ★ The caregiver typing "8am and 8pm" into the wizard is a stated fact, not a
@@ -441,7 +451,7 @@ def _parse_report_date(raw: str | None) -> date:
     # NOT NULL so a row must be insertable even when the date couldn't be read; the
     # caregiver corrects it via LabConfirmRequest.report_date before confirming, same as
     # any other low-confidence field.
-    return date.today()
+    return datetime.now(CHINA_TZ).date()
 
 
 def _to_lab_report_out(report: LabReport, session: Session) -> LabReportOut:
@@ -608,7 +618,7 @@ def confirm_lab_report(
         if edit.flag is not None:
             item.flag = edit.flag
 
-    report.confirmed_at = datetime.now()
+    report.confirmed_at = datetime.now(CHINA_TZ)
     session.flush()
     return _lab_state(caregiver.patient_id, session)
 
@@ -645,8 +655,9 @@ def today(
     if patient_id != caregiver.patient_id:
         raise HTTPException(status_code=403, detail="token does not match requested patient")
 
-    day_start = datetime.combine(datetime.now().date(), datetime.min.time())
-    day_end = datetime.combine(datetime.now().date(), datetime.max.time())
+    now = datetime.now(CHINA_TZ)
+    day_start = datetime.combine(now.date(), datetime.min.time(), tzinfo=CHINA_TZ)
+    day_end = datetime.combine(now.date(), datetime.max.time(), tzinfo=CHINA_TZ)
     rows = session.execute(
         select(Dose, Medication)
         .join(Medication, Dose.medication_id == Medication.id)
@@ -658,7 +669,6 @@ def today(
         .order_by(Dose.scheduled_at)
     ).all()
 
-    now = datetime.now()
     confirmed: list[DoseView] = []
     pending: list[DoseView] = []
     unknown: list[DoseView] = []
@@ -722,7 +732,7 @@ def create_pairing_code(
         raise HTTPException(status_code=503, detail="couldn't generate a unique code, try again")
 
     patient.pairing_code = code
-    patient.pairing_code_expires_at = datetime.now() + timedelta(minutes=15)
+    patient.pairing_code_expires_at = datetime.now(CHINA_TZ) + timedelta(minutes=15)
     session.flush()
     return PairingCodeOut(code=code, expires_at=patient.pairing_code_expires_at)
 
