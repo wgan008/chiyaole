@@ -16,6 +16,7 @@ is always a bound parameter, on every path, without exception.
 
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Any
 from zoneinfo import ZoneInfo
 
@@ -98,8 +99,21 @@ _MED_TAKEN_TODAY = text("""
 # --------------------------------------------------------------------------- runners
 
 
+def _row_to_china_tz(row: dict[str, Any]) -> dict[str, Any]:
+    """★ Every timestamp column comes back from psycopg as a UTC-instant, timezone-aware
+    datetime (correct — that's what's actually stored). Converted to China wall-clock time
+    right here, once, for every row/column, rather than leaving it to `qa.phrase` (or the
+    LLM it calls) to somehow know to do that — confirmed live: a caregiver's 18:55 dose
+    got read back to the elder as "10:55", the raw UTC hour, because nothing ever
+    converted it before the value reached the phrasing step."""
+    return {
+        k: v.astimezone(CHINA_TZ) if isinstance(v, datetime) and v.tzinfo is not None else v
+        for k, v in row.items()
+    }
+
+
 def _rows(session: Session, stmt: Any, params: dict[str, Any]) -> list[dict[str, Any]]:
-    return [dict(r) for r in session.execute(stmt, params).mappings().all()]
+    return [_row_to_china_tz(dict(r)) for r in session.execute(stmt, params).mappings().all()]
 
 
 def metric_latest(session: Session, patient_id: str, slots: Slots) -> QueryResult:
