@@ -21,17 +21,18 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField("String", "API_BASE_URL", "\"https://api.chiyaole.cn\"")
+        buildConfigField("String", "API_BASE_URL", "\"https://api.chiyaole.space\"")
     }
 
     buildTypes {
         debug {
             isMinifyEnabled = false
-            // 10.0.2.2 is the emulator's alias for the host machine's localhost — see
-            // src/debug/res/xml/network_security_config.xml for the matching cleartext
-            // exception (release stays HTTPS-only, untouched). Swap back to a real
-            // staging URL once one exists.
-            buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:8000\"")
+            // Points at the real deployed server (HTTPS — no cleartext exception needed,
+            // that only ever covered plain HTTP; see src/debug/res/xml/
+            // network_security_config.xml). Only override to "http://10.0.2.2:8000" (the
+            // emulator's alias for the host) when testing against a local dev server
+            // instead — see docs/deploy/aliyun.md for what's actually running where.
+            buildConfigField("String", "API_BASE_URL", "\"https://api.chiyaole.space\"")
         }
         release {
             isMinifyEnabled = true
