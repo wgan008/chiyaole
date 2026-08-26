@@ -34,6 +34,18 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <!-- ❌ Never request: contacts, location, photo library, call log, SMS -->
 
+    <!-- ★ Confirmed live: without this, TextToSpeech's constructor fails with status=-1 on
+         API 30+ — Android's package-visibility filtering (AppsFilter) blocks the app from
+         even seeing/binding to a TTS engine package (logcat: "AppsFilter: interaction:
+         ...cn.chiyaole -> ...com.xiaomi.mibrain.speech BLOCKED") unless this <queries>
+         declaration is present, regardless of which engine is selected as the device
+         default in Settings. This isn't optional boilerplate; it's the actual fix. -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.TTS_SERVICE" />
+        </intent>
+    </queries>
+
     <application
         android:name=".ChiYaoLeApp"
         android:allowBackup="false"
