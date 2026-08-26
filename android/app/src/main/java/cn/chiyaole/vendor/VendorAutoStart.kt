@@ -47,6 +47,37 @@ object VendorAutoStart {
         }
     }
 
+    /**
+     * MIUI-only, and a genuinely separate permission from autostart above — confirmed live:
+     * an alarm fired correctly (AlarmManager's own wakeup log confirmed it), but MIUI logged
+     * "MIUILOG- Permission Denied Activity" for the app's startActivity() call at the exact
+     * alarm time and never showed AlarmActivity at all. Android's own full-screen-intent
+     * notification mechanism is supposed to be exempt from the background-activity-launch
+     * restriction it's built to bypass in the first place — MIUI adds its own separate gate
+     * on top ("后台弹出界面" / display pop-up windows while running in the background),
+     * which nothing in this app was asking the installer to grant.
+     */
+    fun openBackgroundPopupSettings(context: Context): Boolean {
+        if (detect() != Vendor.XIAOMI) return false
+        val intent = Intent().apply {
+            component = android.content.ComponentName(
+                "com.miui.securitycenter",
+                "com.miui.permcenter.permissions.PermissionsEditorActivity",
+            )
+            putExtra("extra_pkgname", context.packageName)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        val resolves = context.packageManager.resolveActivity(intent, 0) != null
+        return runCatching {
+            context.startActivity(if (resolves) intent else appDetailsIntent(context))
+            true
+        }.getOrElse {
+            Log.w(TAG, "MIUI background-popup deep link failed, falling back to app details", it)
+            runCatching { context.startActivity(appDetailsIntent(context)) }
+            false
+        }
+    }
+
     private fun vendorIntent(context: Context, vendor: Vendor): Intent {
         val candidate = when (vendor) {
             Vendor.HUAWEI -> componentIntent(

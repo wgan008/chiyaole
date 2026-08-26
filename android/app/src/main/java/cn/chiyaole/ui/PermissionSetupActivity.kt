@@ -75,6 +75,7 @@ class PermissionSetupActivity : ComponentActivity() {
 
 private const val PREFS = "device_prefs"
 private const val KEY_AUTOSTART_CONFIRMED = "autostart_confirmed"
+private const val KEY_BG_POPUP_CONFIRMED = "bg_popup_confirmed"
 
 /** Mirrors the spec §3.5② pseudocode 1:1 — four (five, on 34+) checks, each simply on or off. */
 fun permissionSteps(context: Context): List<PermissionStep> = listOfNotNull(
@@ -118,12 +119,30 @@ fun permissionSteps(context: Context): List<PermissionStep> = listOfNotNull(
     PermissionStep(
         id = "autostart",
         title = context.getString(R.string.permission_step_autostart),
-        done = manuallyConfirmed(context),
+        done = manuallyConfirmed(context, KEY_AUTOSTART_CONFIRMED),
         open = {
             VendorAutoStart.openVendorAutoStartSettings(context)
-            setAutostartConfirmed(context, true)
+            setManuallyConfirmed(context, KEY_AUTOSTART_CONFIRMED, true)
         },
     ),
+
+    // ★ Confirmed live, a genuinely separate permission from autostart above: an alarm
+    // fired correctly (AlarmManager's own log confirmed the wakeup) but MIUI blocked the
+    // app's startActivity() call at that exact moment — "MIUILOG- Permission Denied
+    // Activity" — because this permission was never granted. See VendorAutoStart.
+    // openBackgroundPopupSettings's own docstring for why full-screen-intent notifications
+    // don't already bypass this on MIUI the way they do on stock Android.
+    if (VendorAutoStart.detect() == VendorAutoStart.Vendor.XIAOMI) {
+        PermissionStep(
+            id = "bg_popup",
+            title = context.getString(R.string.permission_step_bg_popup),
+            done = manuallyConfirmed(context, KEY_BG_POPUP_CONFIRMED),
+            open = {
+                VendorAutoStart.openBackgroundPopupSettings(context)
+                setManuallyConfirmed(context, KEY_BG_POPUP_CONFIRMED, true)
+            },
+        )
+    } else null,
 )
 
 private fun exactAlarmIntent(context: Context): Intent =
@@ -142,11 +161,11 @@ private fun fullScreenIntentSettingsIntent(context: Context): Intent =
 private fun prefs(context: Context): SharedPreferences =
     context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
-private fun manuallyConfirmed(context: Context): Boolean =
-    prefs(context).getBoolean(KEY_AUTOSTART_CONFIRMED, false)
+private fun manuallyConfirmed(context: Context, key: String = KEY_AUTOSTART_CONFIRMED): Boolean =
+    prefs(context).getBoolean(key, false)
 
-private fun setAutostartConfirmed(context: Context, value: Boolean) {
-    prefs(context).edit().putBoolean(KEY_AUTOSTART_CONFIRMED, value).apply()
+private fun setManuallyConfirmed(context: Context, key: String, value: Boolean) {
+    prefs(context).edit().putBoolean(key, value).apply()
 }
 
 @Composable

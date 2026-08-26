@@ -42,6 +42,7 @@
     <string name="permission_step_notifications">允许通知</string>
     <string name="permission_step_battery">关闭电池优化限制</string>
     <string name="permission_step_autostart">允许自启动</string>
+    <string name="permission_step_bg_popup">允许后台弹出界面</string>
     <string name="permission_open_settings">去设置</string>
     <string name="permission_recheck">我已经设置好了</string>
 </resources>
