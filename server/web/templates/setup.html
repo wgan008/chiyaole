@@ -1,7 +1,19 @@
 {% extends "base.html" %}
 {% block title %}联系方式 - 吃药了{% endblock %}
 {% block content %}
-<h1>联系方式</h1>
+<h1 id="pairing">配对老人手机</h1>
+<p class="hint">在老人手机上装好 App 后，打开它会要求输入一个配对码。点下面的按钮生成一个，
+  念给装手机的人听——15 分钟内有效，用过一次或者重新生成一个新的，旧的就失效了。</p>
+<div class="card">
+  <button id="genCodeBtn">生成配对码</button>
+  <div id="codeBox" style="display:none;margin-top:12px;text-align:center">
+    <div id="codeDigits" style="font-size:40px;font-weight:700;letter-spacing:6px"></div>
+    <div id="codeExpiry" class="hint" style="margin-top:4px"></div>
+  </div>
+  <div id="codeMsg" class="msg"></div>
+</div>
+
+<h1 style="margin-top:32px">联系方式</h1>
 <p class="hint">这些名字会被设备原样念出来，比如"王阿姨该吃药了"、"我这就去问小芳"。
   写老人平时怎么称呼，不用写身份证上的名字。</p>
 <div class="card">
@@ -20,18 +32,6 @@
   <input type="tel" id="phone" placeholder="手机号">
   <button id="save">保存</button>
   <div id="msg" class="msg"></div>
-</div>
-
-<h1 style="margin-top:32px">配对老人手机</h1>
-<p class="hint">在老人手机上装好 App 后，打开它会要求输入一个配对码。点下面的按钮生成一个，
-  念给装手机的人听——15 分钟内有效，用过一次或者重新生成一个新的，旧的就失效了。</p>
-<div class="card">
-  <button id="genCodeBtn">生成配对码</button>
-  <div id="codeBox" style="display:none;margin-top:12px;text-align:center">
-    <div id="codeDigits" style="font-size:40px;font-weight:700;letter-spacing:6px"></div>
-    <div id="codeExpiry" class="hint" style="margin-top:4px"></div>
-  </div>
-  <div id="codeMsg" class="msg"></div>
 </div>
 {% endblock %}
 {% block scripts %}
