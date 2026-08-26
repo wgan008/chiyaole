@@ -32,6 +32,7 @@ import androidx.lifecycle.lifecycleScope
 import cn.chiyaole.net.DeviceAuth
 import cn.chiyaole.net.DevicePairRequest
 import cn.chiyaole.net.NetworkModule
+import cn.chiyaole.net.SyncWorker
 import cn.chiyaole.ui.components.BigButton
 import cn.chiyaole.ui.theme.ChiYaoLeTheme
 import cn.chiyaole.ui.theme.Dimens
@@ -96,6 +97,12 @@ class PairingActivity : ComponentActivity() {
                     patientId = result.device_token
                     patientDisplayName = result.display_name
                 }
+                // ★ Confirmed live: without this, a freshly-paired device shows "今天没有
+                // 安排" until SyncWorker's own periodic timer happens to fire — up to 6
+                // hours away, and that timer is set once ever (ExistingPeriodicWorkPolicy.
+                // KEEP in SyncWorker.enqueuePeriodic), not reset on pairing. Nothing else
+                // was pulling the schedule down at the one moment it's most needed.
+                SyncWorker.enqueue(this@PairingActivity)
                 withContext(Dispatchers.Main) {
                     startActivity(Intent(this@PairingActivity, HomeActivity::class.java))
                     finish()

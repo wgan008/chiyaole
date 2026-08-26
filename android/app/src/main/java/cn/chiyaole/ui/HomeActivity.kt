@@ -31,7 +31,9 @@ import cn.chiyaole.alarm.AlarmScheduler
 import cn.chiyaole.alarm.KeepAliveService
 import cn.chiyaole.data.DoseEntity
 import cn.chiyaole.data.ScheduleRepository
+import android.widget.Toast
 import cn.chiyaole.net.DeviceAuth
+import cn.chiyaole.net.SyncWorker
 import cn.chiyaole.ui.components.SecondaryButton
 import cn.chiyaole.ui.theme.ChiYaoLeTheme
 import cn.chiyaole.ui.theme.Dimens
@@ -65,6 +67,13 @@ class HomeActivity : ComponentActivity() {
 
         KeepAliveService.start(this)
         lifecycleScope.launch { AlarmScheduler.rescheduleNext(this@HomeActivity) }
+        // ★ Confirmed live: SyncWorker.enqueuePeriodic's 6-hour timer is set once ever
+        // (ExistingPeriodicWorkPolicy.KEEP) and nothing else was pulling fresh data down —
+        // a caregiver changing today's schedule and then having the elder open the app
+        // could sit stale for hours. observeToday() below is a Room Flow, so a sync
+        // landing new rows updates the UI on its own; no extra wiring needed here beyond
+        // kicking the sync off.
+        SyncWorker.enqueue(this)
 
         if (!PermissionSetupActivity.allStepsDone(this)) {
             startActivity(Intent(this, PermissionSetupActivity::class.java))
@@ -87,6 +96,10 @@ class HomeActivity : ComponentActivity() {
                     onOpenSetup = { startActivity(Intent(this, PermissionSetupActivity::class.java)) },
                     onOpenDoctorView = { startActivity(Intent(this, DoctorViewActivity::class.java)) },
                     onAskQuestion = { startActivity(Intent(this, QaActivity::class.java)) },
+                    onRefresh = {
+                        SyncWorker.enqueue(this)
+                        Toast.makeText(this, "正在同步…", Toast.LENGTH_SHORT).show()
+                    },
                 )
             }
         }
@@ -110,6 +123,7 @@ private fun HomeScreen(
     onOpenSetup: () -> Unit,
     onOpenDoctorView: () -> Unit,
     onAskQuestion: () -> Unit,
+    onRefresh: () -> Unit,
 ) {
     Scaffold { padding ->
         Column(
@@ -124,6 +138,9 @@ private fun HomeScreen(
             ) {
                 Text(text = "今天", fontSize = Dimens.primaryTextSp, fontWeight = FontWeight.Bold)
                 Row {
+                    TextButton(onClick = onRefresh) {
+                        Text(text = "刷新", fontSize = Dimens.minTextSp)
+                    }
                     TextButton(onClick = onOpenDoctorView) {
                         Text(text = doctorButtonLabel, fontSize = Dimens.minTextSp)
                     }
