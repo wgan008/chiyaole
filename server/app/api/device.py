@@ -212,10 +212,18 @@ def transcribe_audio(
     meds = _active_medications(session, patient.id)
     bias_terms = sorted({name for m in meds for name in (m.generic_name, m.brand_name) if name})
 
+    # Same local-vs-OSS branch as caregiver.py's parse routes: file:// only resolves to a
+    # real file when storage is local-disk; real OSS already gives a DashScope-reachable
+    # signed URL directly. ★ Missed this route in the original OSS cutover — confirmed
+    # live: every /api/asr call 502'd once OSS was configured, because this kept building
+    # a file:// path to a file that OSS mode never actually writes to local disk at all.
+    audio_url = (
+        f"file://{storage.local_path(asset.oss_key)}"
+        if storage.is_local()
+        else storage.url_for(asset.oss_key)
+    )
     try:
-        text, confidence = transcribe(
-            f"file://{storage.local_path(asset.oss_key)}", bias_terms=bias_terms or None
-        )
+        text, confidence = transcribe(audio_url, bias_terms=bias_terms or None)
     except LLMUnavailable as exc:
         raise HTTPException(
             status_code=502, detail=f"couldn't hear that, try again: {exc}"

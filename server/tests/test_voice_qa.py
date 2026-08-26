@@ -30,6 +30,41 @@ def test_asr_transcribes_uploaded_audio(
     assert body["confidence"] == 0.92
 
 
+def test_asr_uses_a_fetchable_url_in_oss_mode_not_a_local_path(
+    client: TestClient, patient: Patient, monkeypatch
+) -> None:
+    """★ Regression test for a real bug hit live: once real OSS storage was wired up,
+    every /api/asr call 502'd, because this route still built a file:// path to a file
+    OSS mode never actually writes to local disk (app/services/storage.py's save() is a
+    strict either/or between OSS and local disk, not both). Mirrors caregiver.py's own
+    parse routes, which already branched on storage.is_local() correctly — this one was
+    missed in the original OSS cutover."""
+    from app.services import storage
+
+    monkeypatch.setattr(storage, "_oss_configured", lambda: True)
+    monkeypatch.setattr(storage, "url_for", lambda oss_key: f"https://oss.example/{oss_key}")
+    monkeypatch.setattr(
+        "app.api.device.storage.save", lambda *a, **k: ("some/oss/key.m4a", "deadbeef")
+    )
+
+    captured: dict[str, str] = {}
+
+    def _fake_transcribe(audio_url: str, **kwargs: object) -> tuple[str, float]:
+        captured["audio_url"] = audio_url
+        return "我今天吃药了没", 0.92
+
+    monkeypatch.setattr("app.api.device.transcribe", _fake_transcribe)
+
+    resp = client.post(
+        "/api/asr",
+        headers={"X-Device-Token": patient.id},
+        files={"file": ("clip.m4a", b"fake-audio-bytes", "audio/mp4")},
+    )
+    assert resp.status_code == 200
+    assert captured["audio_url"].startswith("https://oss.example/")
+    assert not captured["audio_url"].startswith("file://")
+
+
 def test_asr_reports_502_when_llm_unavailable(
     client: TestClient, patient: Patient, monkeypatch
 ) -> None:
