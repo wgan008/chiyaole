@@ -44,6 +44,10 @@ evals/asr_samples/*.wav
 evals/asr_samples/*.m4a
 evals/labs/real/
 field-notes/*-private.md
+# Real family medical records/pill-box photos were committed here once and had to be
+# scrubbed from git history — never again. Use evals/boxes/ (synthetic fixtures) instead.
+data/test_photos/
+data/test_reports/
 
 # OS / editor
 .DS_Store

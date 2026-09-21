@@ -132,6 +132,16 @@ cold-start problem of a 2018 SoC. Passing on either end alone proves nothing.
 
 ---
 
+## License
+
+[Business Source License 1.1](LICENSE) — source-available, not open source. Free to read,
+run, and modify for non-production, personal, educational, and research use. Running it (or
+a derivative) as a hosted service, or operating it as a paid medication-adherence product,
+requires a commercial license until the Change Date (2030-09-21), after which it converts
+to Apache License 2.0.
+
+---
+
 *Disclaimer: this product explicitly does not provide diagnostic advice and does not recommend
 adjusting or stopping any medication. Regulatory notes here are a summary of public information,
 not legal advice.*
