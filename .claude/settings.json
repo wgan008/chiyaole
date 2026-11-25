@@ -2,7 +2,7 @@
   "permissions": {
     "allow": [
       "Bash(git status)",
-      "Bash(npm test)"
+      "Bash(make check)"
     ]
   }
 }
